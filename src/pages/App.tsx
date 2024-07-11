@@ -1,5 +1,11 @@
+import { Navbar } from "../components/Navbar"
+import '../../styles/tailwind.css';
 export default function App(){
     return(
-        <h1>Hey pookies</h1>
+        <>
+        
+        <Navbar />
+        <h1 className="text-6xl font-bold underline">Hey pookies</h1>
+        </>
     )
 }
