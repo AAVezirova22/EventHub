@@ -1,8 +1,12 @@
+'use client'
 import * as React from "react"
+import  { useEffect } from 'react';
 import * as NavigationMenuPrimitive from "@radix-ui/react-navigation-menu"
 import { cva } from "class-variance-authority"
 import { ChevronDown } from "lucide-react"
 import Link from "next/link"
+import { useState } from "react";
+import "@/app/script"
 import { cn } from "@/lib/utils"
 import * as AvatarPrimitive from "@radix-ui/react-avatar"
 import {  AvatarFallback, AvatarImage } from "@radix-ui/react-avatar"
@@ -136,15 +140,92 @@ Avatar.displayName = AvatarPrimitive.Root.displayName
 
 
 export default function Navbar (){
+
+const [isOpen, setIsOpen] = useState(false);
+
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
+  const toggleNavbar = () => {
+   
+    setIsCollapsed(!isCollapsed);
+  };
   return(
     <>
       <NavigationMenu className=" px-4">
         <NavigationMenuList>
           {/* hamburger menu, needs to be made into a working button */}
           <NavigationMenuItem >
-          <div className="bg-slate-400 w-[2.6rem] h-[0.36rem] rounded mb-[0.15rem]"></div>
-          <div className="bg-slate-400 w-[2.6rem] h-[0.36rem] rounded mb-[0.15rem]"></div>
-          <div className="bg-slate-400 w-[2.6rem] h-[0.36rem] rounded mb-[0.15rem]"></div>
+          <div className="flex">
+      {/* Sidenav */}
+      <nav
+        id="sidenav-1"
+        className={`fixed top-[3rem] left-0 h-[calc(100%-3rem)] bg-white p-4 transition-transform transform ${
+          isOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        <ul className="space-y-2 flex flex-col items-center">
+           
+          <li>
+             {/* the add button */}
+             <button className="bg-slate-400 flex items-center justify-center rounded h-[3rem] w-[5.5rem]">
+              <div className="text-slate-600 text-[1.2rem] font-extrabold flex items-center justify-center">
+                New
+              </div>
+            </button>
+          </li>
+          <li className="text-slate-400">
+            <div className="flex items-center cursor-pointer">
+              <i className="fas fa-grin mr-3"></i>
+              <span>Category 1</span>
+            </div>
+            <ul className="ml-6 mt-2 space-y-2">
+              <li className="text-slate-400">
+                <span>Link 2</span>
+              </li>
+              <li className="text-slate-400">
+                <span>Link 3</span>
+              </li>
+            </ul>
+          </li>
+          <li className="text-slate-400">
+            <div className="flex items-center cursor-pointer">
+              <i className="fas fa-grin-wink mr-3"></i>
+              <span>Category 2</span>
+            </div>
+            <ul className="ml-6 mt-2 space-y-2">
+              <li className="text-slate-400">
+                <span>Link 4</span>
+              </li>
+              <li className="text-slate-400">
+                <span>Link 5</span>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+
+      {/* Toggler */}
+    
+        
+        <button
+  onClick={() => setIsOpen(!isOpen)}  // Correct handler for hamburger menu
+  className="navbar-toggler focus:outline-none"
+  aria-controls="navbarToggleExternalContent10"
+  aria-expanded={isOpen}  // Adjust to reflect the state
+  aria-label="Toggle navigation"
+>
+  <div className="flex flex-col items-center justify-center space-y-[0.15rem]">
+    <span className="block w-8 h-1 rounded bg-slate-400"></span>
+    <span className="block w-8 h-1 rounded bg-slate-400"></span>
+    <span className="block w-8 h-1 rounded bg-slate-400"></span>
+  </div>
+</button>
+        
+      
+    </div>
+  
+
+            
           </NavigationMenuItem>
           <NavigationMenuItem>
             {/* add icon */}
@@ -164,18 +245,21 @@ export default function Navbar (){
           </NavigationMenuItem>
           <NavigationMenuItem>
             {/* search, make into button later */}
-          <div className="relative inline-block w-10 h-10 mt-2">
-            <div className="absolute top-1 left-1 w-[1.4rem] h-[1.4rem] border-[0.28rem] border-slate-400 rounded-full"></div>
-            <div className="absolute mr-[0.83rem] mb-[0.6rem]  bottom-0 right-0 w-2 h-[0.35rem] bg-slate-400 transform rotate-45 origin-bottom-right"></div>
-          </div>
+            <button>
+              <div className="relative inline-block w-10 h-10 mt-2">
+                <div className="absolute top-1 left-1 w-[1.4rem] h-[1.4rem] border-[0.28rem] border-slate-500 rounded-full"></div>
+                <div className="absolute mr-[0.83rem] mb-[0.6rem]  bottom-0 right-0 w-2 h-[0.35rem] bg-slate-500 transform rotate-45 origin-bottom-right"></div>
+              </div>
+            </button>
+          
           </NavigationMenuItem>
           <NavigationMenuItem>
             {/* the add button */}
             <button className="bg-slate-400 flex items-center justify-center rounded ml-4 h-8 w-[3.6rem]">
-            <div className="relative w-10 h-10 flex items-center justify-center">
-              <div className="absolute w-4 h-[0.3em] bg-white rounded"></div>
-              <div className="w-[0.3rem] h-4 absolute bg-white rounded"></div>
-            </div>
+              <div className="relative w-10 h-10 flex items-center justify-center">
+                <div className="absolute w-4 h-[0.3em] bg-white rounded"></div>
+                <div className="w-[0.3rem] h-4 absolute bg-white rounded"></div>
+              </div>
             </button>
           </NavigationMenuItem>
           <NavigationMenuItem>
