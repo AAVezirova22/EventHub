@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from 'zod'
 import { Button } from "@/components/ui/button"
+import mongoose, { Schema, Document } from 'mongoose';
 import {
   Form,
   FormControl,
@@ -33,6 +34,20 @@ const signUpValidation = z.object({
 })
 
 
+export interface IUser extends Document {
+  name: string;
+  lastName: string;
+  username: string;
+  email: string;
+  password: string;
+}
+const UserSchema: Schema = new Schema({
+  name: { type: String, required: true },
+  lastName: { type: String, required: true },
+  username: { type: String, required: true, unique: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+});
 
 export default function SignUp() {
   const form = useForm<z.infer<typeof signUpValidation>>({
