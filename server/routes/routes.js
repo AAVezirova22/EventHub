@@ -1,7 +1,7 @@
 const express = require('express');
 
 const router = express.Router()
-const Model = require('../models/model');
+const Model = require('../model/model');
 module.exports = router;
 
 router.post('/post', (req, res) => {
@@ -28,7 +28,7 @@ router.delete('/delete/:id', (req, res) => {
     res.send('Delete by ID API')
 })
 
-router.post('/post', (req, res) => {
+router.post('/post', async (req, res) => {
     const data = new Model({
         name: req.body.name,
         lastName: req.body.lastName,
