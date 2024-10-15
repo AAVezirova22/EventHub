@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
             )
         }
 
-        const salt = await bcryptjs.getSalt("10");
+        const salt = await bcryptjs.genSaltSync(10);
         const hashedPassword = await bcryptjs.hash(password, salt);
 
         const savedUser = await new User({
