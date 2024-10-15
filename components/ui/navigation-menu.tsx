@@ -10,6 +10,11 @@ import "@/app/script"
 import { cn } from "@/app/utils"
 import * as AvatarPrimitive from "@radix-ui/react-avatar"
 import {  AvatarFallback, AvatarImage } from "@radix-ui/react-avatar"
+import { isAuthentic } from "@/app/signup/page";
+import { Button } from "./button";
+
+
+
 const NavigationMenu = React.forwardRef<
   React.ElementRef<typeof NavigationMenuPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Root>
@@ -153,7 +158,8 @@ const [isOpen, setIsOpen] = useState(false);
     <>
       <NavigationMenu className=" px-4">
         <NavigationMenuList>
-          {/* hamburger menu, needs to be made into a working button */}
+          {/* hamburger menu */}
+        <div className="flex-row items-center flex">
           <NavigationMenuItem >
           <div className="flex">
       {/* Sidenav */}
@@ -164,7 +170,8 @@ const [isOpen, setIsOpen] = useState(false);
         }`}
       >
         <ul className="space-y-2 flex flex-col items-center">
-           
+           {isAuthentic ? (
+            <>
           <li>
              {/* the add button */}
              <button className="bg-slate-400 flex items-center justify-center rounded h-[3rem] w-[5.5rem]">
@@ -201,6 +208,15 @@ const [isOpen, setIsOpen] = useState(false);
               </li>
             </ul>
           </li>
+          </>
+ ): (
+  <>
+  <h3 className="font-bold text-slate-600 text-center">Nothing here <br /> unless you</h3>
+    <a href="/login"><Button type="submit" className="px-9 bg-slate-500 font-bold" >Log in</Button></a>
+    <h3 className="font-bold text-slate-600 ">or</h3>
+    <a href="/signup"><Button type="submit" className="px-8 bg-slate-500 font-bold" >Sign up</Button>  </a>
+  </>
+ )}
         </ul>
       </nav>
 
@@ -235,6 +251,8 @@ const [isOpen, setIsOpen] = useState(false);
               </NavigationMenuLink>
             </Link>
           </NavigationMenuItem>
+          </div>
+          <div className="flex-row items-center flex">
           <NavigationMenuItem>
             {/* search box */}
           <input 
@@ -262,9 +280,15 @@ const [isOpen, setIsOpen] = useState(false);
               </div>
             </button>
           </NavigationMenuItem>
-          <NavigationMenuItem>
+          </div>
+          {/* gotta fix this */}
+          <div className="flex-row items-center flex ">
+
+            {isAuthentic ? (
+              <>
+                 <NavigationMenuItem>
             {/* notification button */}
-            <button className="relative flex items-center justify-center ml-[13rem]">
+            <button className="relative ml-auto flex items-center justify-center ">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-8 w-8 text-slate-400"
@@ -289,8 +313,21 @@ const [isOpen, setIsOpen] = useState(false);
               {/* this here ^ are the initials of the person which appear when the avatar does not load */}
             </Avatar>
           </NavigationMenuItem>
+              </>
+            ) : (
+              <> 
+              
+    <a href="/login"><Button type="submit" className="px-9 bg-slate-500 font-bold" >Log in</Button></a>
+    <h3 className="font-bold text-slate-600 ">or</h3>
+    <a href="/signup"><Button type="submit" className="px-8 bg-slate-500 font-bold" >Sign up</Button>  </a>
+  
+              </>
+            )}
+         
+          </div>
         </NavigationMenuList>
       </NavigationMenu>
+
     </>
 
   )

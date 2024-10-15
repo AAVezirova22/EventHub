@@ -27,6 +27,7 @@ const signUpValidation = z.object({
   email: z.string().optional(),  // Remove .email() validation
   password: z.string().optional() // Remove .min() validation
 });
+export let isAuthentic: boolean = false;
 
 
 
@@ -76,6 +77,7 @@ export default function SignUp() {
       if(res.status == 200 || res.status == 201){
         console.log("user added successfully");
         setError("")
+        isAuthentic = true;
         router.push("/")
       }
     }catch(error){
@@ -90,6 +92,7 @@ export default function SignUp() {
       email: "",
       password: "",
       })
+   
     }
   }
  
@@ -174,3 +177,4 @@ export default function SignUp() {
     </>
   );
 }
+
