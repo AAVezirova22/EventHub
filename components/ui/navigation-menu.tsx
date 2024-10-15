@@ -7,7 +7,7 @@ import { ChevronDown } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react";
 import "@/app/script"
-import { cn } from "@/lib/utils"
+import { cn } from "@/app/utils"
 import * as AvatarPrimitive from "@radix-ui/react-avatar"
 import {  AvatarFallback, AvatarImage } from "@radix-ui/react-avatar"
 const NavigationMenu = React.forwardRef<
