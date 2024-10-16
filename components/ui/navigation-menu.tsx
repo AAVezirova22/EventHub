@@ -10,9 +10,9 @@ import "@/app/script"
 import { cn } from "@/app/utils"
 import * as AvatarPrimitive from "@radix-ui/react-avatar"
 import {  AvatarFallback, AvatarImage } from "@radix-ui/react-avatar"
-import { isAuthentic } from "@/app/signup/page";
 import { Button } from "./button";
-
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 
 const NavigationMenu = React.forwardRef<
@@ -154,6 +154,9 @@ const [isOpen, setIsOpen] = useState(false);
    
     setIsCollapsed(!isCollapsed);
   };
+  const router = useRouter();
+  const {data:session} = useSession();
+
   return(
     <>
       <NavigationMenu className=" px-4">
@@ -170,7 +173,7 @@ const [isOpen, setIsOpen] = useState(false);
         }`}
       >
         <ul className="space-y-2 flex flex-col items-center">
-           {isAuthentic ? (
+           {session ? (
             <>
           <li>
              {/* the add button */}
@@ -284,7 +287,7 @@ const [isOpen, setIsOpen] = useState(false);
           {/* gotta fix this */}
           <div className="flex-row items-center flex ">
 
-            {isAuthentic ? (
+            {session ? (
               <>
                  <NavigationMenuItem>
             {/* notification button */}

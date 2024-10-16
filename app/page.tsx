@@ -2,15 +2,15 @@
 
 import Navbar from "../components/ui/navigation-menu";
 import { useRouter } from 'next/navigation';
-import { isAuthentic } from "./signup/page";
+import { useSession } from "next-auth/react";
 
 export default function Home() {
   const router = useRouter();
-
+  const {data:session} = useSession();
   return (
     <>
       <Navbar />
-      {!isAuthentic ? "HEYYYY" : null}
+      {session && <span>{session.user?.name}</span>}
     </>
   );
 }

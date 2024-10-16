@@ -15,9 +15,8 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { useRouter } from 'next/navigation'; // Import useRouter
-import { isAuthentic as importedIsAuthentic} from "../signup/page";
+import { signIn } from "next-auth/react";
 
-let isAuthentic = importedIsAuthentic;
 
 const registerValidation = z.object({
   email: z.string().email(),
@@ -35,44 +34,55 @@ export default function Register() {
     },
   });
 
-  const [error, setError] = useState<string | null>(null); // State for error messages
-  const router = useRouter(); // Initialize router
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const [error, setError] = useState("");
+  const [user, setUser] = useState({
 
-  // Declare onSubmit as async
-  async function onSubmit(values: z.infer<typeof registerValidation>) {
-    console.log(values); // Log the input values for debugging
-    
-    try {
-      const response = await fetch('/api/login', { // Adjust the path based on your API route
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          action: "login", // Indicate this is a login action
-          email: values.email,
-          password: values.password,
-        }),
-      });
+      
+      email: "",
+      password: "",
+  });
 
-      const data = await response.json(); // Parse the response
+  const handleInputChange = (event: any) => {
+    const { name, value} = event.target;
+    return setUser((prevInfo) => ({...prevInfo, [name]: value}))
+  }
 
-      if (response.ok) {
-        // Handle successful login (e.g., redirect to a dashboard, store a token, etc.)
-        console.log('Login successful:', data);
-        isAuthentic = true;
-
-        router.push('/'); // Change this to your desired route
-        setError(null); // Clear any previous errors
-      } else {
-        // Handle errors (e.g., show an error message)
-        console.error('Login failed:', data.error);
-        setError(data.error); // Set the error message
+  const handleSubmit = async(e:any) =>{
+    e.preventDefault()
+    setLoading(true)
+    try{
+      if(!user.email || !user.password){
+        setError("Please, fill all the fields!")
+        return;
       }
-    } catch (error) {
-      console.error('An error occurred:', error);
-      setError("An unexpected error occurred."); // Optional error message for unexpected errors
+      const res = await signIn("credentials", {
+        email:user.email,
+        password:user.password,
+        redirect:false
+      });
+      if(res?.error){
+        console.log(res);
+        setError("error")
+      
+      }
+      setError("")
+        router.push("/")
+     
+    }catch(error){
+      console.log(error);
+      setError("")
+    }finally{
+      setLoading(false)
+      setUser({
+       
+      email: "",
+      password: "",
+      })
+   
     }
+  
   }
 
   return (
@@ -80,19 +90,18 @@ export default function Register() {
       <div className="flex justify-center items-center min-h-screen bg-slate-700 p-5">
         <div className="bg-slate-100 rounded-2xl shadow-lg p-10 max-w-md w-full">
           <Form {...form} >
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" >
+            <form onSubmit={handleSubmit} className="space-y-4" >
               <h1 className="font-bold text-2xl text-center">Log in</h1>
               <p className="text-gray-600 text-center">Log in your account with your email and password.</p>
               
-              {error && <p className="text-red-600 text-center">{error}</p>} {/* Show error message */}
 
-              <FormField
+               <FormField
                 control={form.control}
                 name="email"
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <Input placeholder="Email Address" type="text" className="shad-input" {...field} />
+                      <Input placeholder="Email Address"type="text" className="shad-input" {...field}  name="email" value={user.email} onChange={handleInputChange} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -104,7 +113,7 @@ export default function Register() {
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <Input placeholder="Password" type="password" className="shad-input" {...field} />
+                      <Input placeholder="Password"  type="text" className="shad-input" {...field} name="password" value={user.password} onChange={handleInputChange}/>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
