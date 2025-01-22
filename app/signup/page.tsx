@@ -159,7 +159,7 @@ export default function SignUp() {
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <Input placeholder="Password"  type="text" className="shad-input" {...field} name="password" value={user.password} onChange={handleInputChange}/>
+                      <Input placeholder="Password"  type="password" className="shad-input" {...field} name="password" value={user.password} onChange={handleInputChange}/>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
