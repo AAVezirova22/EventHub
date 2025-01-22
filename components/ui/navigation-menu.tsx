@@ -276,7 +276,7 @@ const [isOpen, setIsOpen] = useState(false);
           </NavigationMenuItem>
           <NavigationMenuItem>
             {/* the add button */}
-            <button className="bg-slate-400 flex items-center justify-center rounded ml-4 h-8 w-[3.6rem]">
+            <button className="bg-slate-400 hover:bg-slate-600 flex items-center justify-center rounded ml-4 h-8 w-[3.6rem]">
               <div className="relative w-10 h-10 flex items-center justify-center">
                 <div className="absolute w-4 h-[0.3em] bg-white rounded"></div>
                 <div className="w-[0.3rem] h-4 absolute bg-white rounded"></div>

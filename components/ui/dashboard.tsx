@@ -13,6 +13,7 @@ import {  AvatarFallback, AvatarImage } from "@radix-ui/react-avatar"
 import { Button } from "./button";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Post from "./post";
 
 export default function Dashboard (){
 
@@ -52,7 +53,7 @@ return (
                                 <div className="p-4 shadow rounded-xl border border-slate-300 py-5 w-[20rem] items-center flex flex-col ">
                                     <p className="text-sky-800 text-center font-bold text-xl">You got any photos from</p>
                                     <p className="text-sky-800 text-center font-bold text-2xl mb-2 ">AAAAAAAAAA ?</p>
-                                    <button className="bg-slate-200 font-bold text-center text-sm px-4 p-1 rounded text-sky-800">Share!</button>
+                                    <button className="bg-slate-200 font-bold text-center text-sm px-4 p-1 rounded text-sky-800 hover:bg-slate-700 hover:text-sky-200">Share!</button>
                                 </div>
                                 <button className="text-2xl font-bold text-slate-300 hover:text-slate-600">&gt;</button>
                             </div>
@@ -61,13 +62,13 @@ return (
                     {/* Explore section */}
                     <div className="p-4">
                         <h1 className="font-bold text-sky-800 text-3xl ml-3 mb-3">Explore</h1>
-                        {/* post */}                    
+                        <Post />              
                     </div>
                 </div>
                     {/* Hot section */}
                     <div className="p-4">
                         <h1 className="font-bold text-sky-800 text-3xl ml-3 mb-3">Hot</h1>
-                        
+                        <Post />  
                     </div>
             </div>
         </div>
