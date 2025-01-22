@@ -249,7 +249,7 @@ const [isOpen, setIsOpen] = useState(false);
           <NavigationMenuItem>
             {/* add icon */}
             <Link href="#" legacyBehavior passHref>
-              <NavigationMenuLink className="font-bold text-slate-400 text-2xl ml-3">
+              <NavigationMenuLink className="font-bold text-sky-800 text-2xl ml-3">
                 EventHub
               </NavigationMenuLink>
             </Link>
@@ -268,8 +268,8 @@ const [isOpen, setIsOpen] = useState(false);
             {/* search, make into button later */}
             <button>
               <div className="relative inline-block w-10 h-10 mt-2">
-                <div className="absolute top-1 left-1 w-[1.4rem] h-[1.4rem] border-[0.28rem] border-slate-500 rounded-full"></div>
-                <div className="absolute mr-[0.83rem] mb-[0.6rem]  bottom-0 right-0 w-2 h-[0.35rem] bg-slate-500 transform rotate-45 origin-bottom-right"></div>
+                <div className="absolute top-1 left-1 w-[1.4rem] h-[1.4rem] border-[0.28rem] border-sky-800 rounded-full"></div>
+                <div className="absolute mr-[0.83rem] mb-[0.6rem]  bottom-0 right-0 w-2 h-[0.35rem] bg-sky-800 transform rotate-45 origin-bottom-right"></div>
               </div>
             </button>
           
@@ -294,7 +294,7 @@ const [isOpen, setIsOpen] = useState(false);
             <button className="relative ml-auto flex items-center justify-center ">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-8 w-8 text-slate-400"
+                className="h-8 w-8 text-sky-800"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
