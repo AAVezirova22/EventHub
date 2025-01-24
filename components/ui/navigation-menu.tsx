@@ -279,7 +279,7 @@ const [isOpen, setIsOpen] = useState(false);
           {/* gotta fix this */}
          
 
-            {!session ? (
+            {session ? (
               <>
                {/* the add button */}
                 <NavigationMenuItem>

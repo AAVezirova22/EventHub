@@ -13,7 +13,7 @@ export default function Home() {
     <>
       <Navbar />
       {session && <span>{session.user?.name}</span>}
-      {!session ? <Dashboard />: null}
+      {session ? <Dashboard />: null}
       
     </>
   );

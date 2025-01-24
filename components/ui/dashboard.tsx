@@ -15,12 +15,27 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Post from "./post";
 import Footer from "@/components/ui/footer";
+import { DateTime } from 'luxon';
 
 export default function Dashboard (){
+    const router = useRouter();
+  const {data:session} = useSession();
+    const dt = DateTime.now();
+let hourMessage;
+
+if (dt.hour >= 3 && dt.hour < 12) {
+    hourMessage = "Good morning";
+} else if (dt.hour >= 12) {
+    hourMessage = "Good afternoon";
+} else {
+    hourMessage = "Good night";
+}
 
 return (
     <>
+
         <div className="container mx-auto p-6">
+            <h1 className="font-bold text-sky-800 text-3xl ml-3 mb-3">{hourMessage}, {session.user?.name}!</h1>
             <div className="grid grid-cols-[2fr_1fr]">
                 <div className="grid-span-2 space-y-6">
                     {/* Top section */}
