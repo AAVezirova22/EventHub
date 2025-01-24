@@ -14,6 +14,7 @@ import { Button } from "./button";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Post from "./post";
+import Footer from "@/components/ui/footer";
 
 export default function Dashboard (){
 
@@ -71,6 +72,7 @@ return (
                         <Post />  
                     </div>
             </div>
+            <Footer />
         </div>
     </>
 )
