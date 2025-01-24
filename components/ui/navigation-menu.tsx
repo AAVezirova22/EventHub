@@ -159,10 +159,10 @@ const [isOpen, setIsOpen] = useState(false);
 
   return(
     <>
-      <NavigationMenu className=" px-4">
+      <NavigationMenu className="px-4 flex items-center justify-between">
         <NavigationMenuList>
           {/* hamburger menu */}
-        <div className="flex-row items-center flex">
+        <div className="flex-row items-center flex space-x-4">
           <NavigationMenuItem >
           <div className="flex">
       {/* Sidenav */}
@@ -217,7 +217,7 @@ const [isOpen, setIsOpen] = useState(false);
   <h3 className="font-bold text-slate-600 text-center">Nothing here <br /> unless you</h3>
     <a href="/login"><Button type="submit" className="px-9 bg-slate-500 font-bold" >Log in</Button></a>
     <h3 className="font-bold text-slate-600 ">or</h3>
-    <a href="/signup"><Button type="submit" className="px-8 bg-slate-500 font-bold" >Sign up</Button>  </a>
+    <a href="/signup"><Button type="submit" className="px-8 bg-slate-500 font-bold " >Sign up</Button>  </a>
   </>
  )}
         </ul>
@@ -274,48 +274,53 @@ const [isOpen, setIsOpen] = useState(false);
             </button>
           
           </NavigationMenuItem>
-          <NavigationMenuItem>
-            {/* the add button */}
-            <button className="bg-slate-400 hover:bg-slate-600 flex items-center justify-center rounded ml-4 h-8 w-[3.6rem]">
-              <div className="relative w-10 h-10 flex items-center justify-center">
-                <div className="absolute w-4 h-[0.3em] bg-white rounded"></div>
-                <div className="w-[0.3rem] h-4 absolute bg-white rounded"></div>
-              </div>
-            </button>
-          </NavigationMenuItem>
-          </div>
+         
+          
           {/* gotta fix this */}
-          <div className="flex-row items-center flex ">
+         
 
-            {session ? (
+            {!session ? (
               <>
-                 <NavigationMenuItem>
-            {/* notification button */}
-            <button className="relative ml-auto flex items-center justify-center ">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-8 w-8 text-sky-800"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M15 17h5l-1.405-1.405C18.315 14.79 18 13.672 18 12.5V11a6.002 6.002 0 00-5-5.917V4a2 2 0 10-4 0v1.083A6.002 6.002 0 004 11v1.5c0 1.172-.315 2.29-.895 3.095L2 17h5m8 0a3 3 0 11-6 0m6 0H9"
-                />
-              </svg>
-            </button>
-          </NavigationMenuItem>
-          <NavigationMenuItem>
-            {/* avatar */}
-            <Avatar className="ml-8 flex items-center  justify-center">
-              <AvatarImage src="https://github.com/shadcn.png"></AvatarImage>
-              <AvatarFallback>CN</AvatarFallback> 
-              {/* this here ^ are the initials of the person which appear when the avatar does not load */}
-            </Avatar>
-          </NavigationMenuItem>
+               {/* the add button */}
+                <NavigationMenuItem>
+                  <button className="bg-slate-400 hover:bg-slate-600 flex items-center justify-center mr-[3rem]  rounded h-8 w-[3.6rem]">
+                    <div className="relative w-10 h-10 flex items-center justify-center">
+                      <div className="absolute w-4 h-[0.3em] bg-white rounded"></div>
+                      <div className="w-[0.3rem] h-4 absolute bg-white rounded"></div>
+                    </div>
+                  </button>
+                </NavigationMenuItem>
+              
+              <div className="flex-row items-center flex space-x-4 ">
+                {/* notification button */}
+                <NavigationMenuItem className="relative">
+                  <button className="relative ml-auto flex items-center justify-center ">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-8 w-8 text-sky-800"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M15 17h5l-1.405-1.405C18.315 14.79 18 13.672 18 12.5V11a6.002 6.002 0 00-5-5.917V4a2 2 0 10-4 0v1.083A6.002 6.002 0 004 11v1.5c0 1.172-.315 2.29-.895 3.095L2 17h5m8 0a3 3 0 11-6 0m6 0H9"
+                      />
+                    </svg>
+                  </button>
+                </NavigationMenuItem>
+                {/* avatar */}
+                <NavigationMenuItem>
+                  
+                  <Avatar className="ml-8 flex items-center  justify-center">
+                    <AvatarImage src="https://github.com/shadcn.png"></AvatarImage>
+                    <AvatarFallback>CN</AvatarFallback> 
+                    {/* this here ^ are the initials of the person which appear when the avatar does not load */}
+                  </Avatar>
+                </NavigationMenuItem>
+              </div>
               </>
             ) : (
               <> 
