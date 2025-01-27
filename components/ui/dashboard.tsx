@@ -10,12 +10,24 @@ import "@/app/script"
 import { cn } from "@/app/utils"
 import * as AvatarPrimitive from "@radix-ui/react-avatar"
 import {  AvatarFallback, AvatarImage } from "@radix-ui/react-avatar"
-import { Button } from "./button";
+
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Post from "./post";
 import Footer from "@/components/ui/footer";
 import { DateTime } from 'luxon';
+import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 
 export default function Dashboard (){
     const router = useRouter();
@@ -35,7 +47,7 @@ return (
     <>
 
         <div className="container mx-auto p-6">
-            <h1 className="font-bold text-sky-800 text-3xl ml-3 mb-3">{hourMessage}, {session.user?.name}!</h1>
+            <h1 className="font-bold text-sky-800 text-3xl ml-3 mb-3">{hourMessage}, {session?.user?.name}!</h1>
             <div className="grid grid-cols-[2fr_1fr]">
                 <div className="grid-span-2 space-y-6">
                     {/* Top section */}

@@ -13,6 +13,7 @@ import {  AvatarFallback, AvatarImage } from "@radix-ui/react-avatar"
 import { Button } from "./button";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import createEvent from "./createEvent";
 
 
 const NavigationMenu = React.forwardRef<
@@ -177,7 +178,7 @@ const [isOpen, setIsOpen] = useState(false);
             <>
           <li>
              {/* the add button */}
-             <button className="bg-slate-400 flex items-center justify-center rounded h-[3rem] w-[5.5rem]">
+             <button className="bg-slate-400 flex items-center justify-center rounded h-[3rem] w-[5.5rem]" >
               <div className="text-slate-600 text-[1.2rem] font-extrabold flex items-center justify-center">
                 New
               </div>
@@ -283,12 +284,7 @@ const [isOpen, setIsOpen] = useState(false);
               <>
                {/* the add button */}
                 <NavigationMenuItem>
-                  <button className="bg-slate-400 hover:bg-slate-600 flex items-center justify-center mr-[3rem]  rounded h-8 w-[3.6rem]">
-                    <div className="relative w-10 h-10 flex items-center justify-center">
-                      <div className="absolute w-4 h-[0.3em] bg-white rounded"></div>
-                      <div className="w-[0.3rem] h-4 absolute bg-white rounded"></div>
-                    </div>
-                  </button>
+                  {createEvent()}
                 </NavigationMenuItem>
               
               <div className="flex-row items-center flex space-x-4 ">
