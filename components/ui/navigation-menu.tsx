@@ -14,6 +14,7 @@ import { Button } from "./button";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import createEvent from "./createEvent";
+import CreateEvent from "./createEvent";
 
 
 const NavigationMenu = React.forwardRef<
@@ -260,7 +261,7 @@ const [isOpen, setIsOpen] = useState(false);
           <NavigationMenuItem>
             {/* search box */}
           <input 
-            type="text" 
+            type="search" 
             placeholder="Search..."
             className="w-[30rem] text-[0.8rem] text-slate-600 font-bold ml-[25rem] px-4 py-[0.3rem] border-[0.15rem] border-gray-300 rounded-3xl focus:outline-none focus:ring-0 focus:border-gray-300 shadow"
           />
@@ -284,7 +285,7 @@ const [isOpen, setIsOpen] = useState(false);
               <>
                {/* the add button */}
                 <NavigationMenuItem>
-                  {createEvent()}
+                  <CreateEvent />
                 </NavigationMenuItem>
               
               <div className="flex-row items-center flex space-x-4 ">
