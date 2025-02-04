@@ -1,4 +1,16 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+<div align="center" >
+<b>Wow! EventHub's repo has had:</b> <br><br>
+<img align="center" src="https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Fgithub.com%2FAAVezirova22%2FEventHub&label=VISITORS&labelColor=%23d9e3f0&countColor=%23263760">
+
+<br><br>
+
+
+
+
+<b>Shortcut to the Figma design</b> <br> <br> https://www.figma.com/design/qwqYFfGsY98Ew7eUUVVMzf/EventHub?node-id=0-1&node-type=canvas&t=pxEMd7OpAokQTtx0-0
+</div>
+
+## This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
 
