@@ -1,4 +1,4 @@
-"use client"; // Mark this component as a Client Component
+"use client"; 
 
 import Navbar from "../components/ui/navigation-menu";
 import { useRouter } from 'next/navigation';
