@@ -158,7 +158,7 @@ const [isOpen, setIsOpen] = useState(false);
   };
   const router = useRouter();
   const {data:session} = useSession();
-
+  let firstName = session?.user?.name;
   return(
     <>
       <NavigationMenu className="px-4 flex items-center justify-between">
@@ -250,11 +250,14 @@ const [isOpen, setIsOpen] = useState(false);
           </NavigationMenuItem>
           <NavigationMenuItem>
             {/* add icon */}
-            <Link href="#" legacyBehavior passHref>
+            
+            <a href="/">
               <NavigationMenuLink className="font-bold text-sky-800 text-2xl ml-3">
+                
                 EventHub
               </NavigationMenuLink>
-            </Link>
+                </a>
+            
           </NavigationMenuItem>
           </div>
           <div className="flex-row items-center flex">
@@ -311,11 +314,11 @@ const [isOpen, setIsOpen] = useState(false);
                 {/* avatar */}
                 <NavigationMenuItem>
                   
-                  <Avatar className="ml-8 flex items-center  justify-center">
+                  <a href="/[userId]"><Avatar className="ml-8 flex items-center  justify-center">
                     <AvatarImage src="https://github.com/shadcn.png"></AvatarImage>
-                    <AvatarFallback>CN</AvatarFallback> 
+                    <AvatarFallback>{firstName?.at(0)?.toUpperCase()}</AvatarFallback> 
                     {/* this here ^ are the initials of the person which appear when the avatar does not load */}
-                  </Avatar>
+                  </Avatar></a>
                 </NavigationMenuItem>
               </div>
               </>
