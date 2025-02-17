@@ -30,24 +30,46 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
 export default function Dashboard (){
+    
     const router = useRouter();
   const {data:session} = useSession();
     const dt = DateTime.now();
 let hourMessage;
 
-if (dt.hour >= 3 && dt.hour < 12) {
+if (dt.hour >= 4 && dt.hour < 12) {
     hourMessage = "Good morning";
-} else if (dt.hour >= 12) {
+} else if (dt.hour >= 1 && dt.hour <=6) {
     hourMessage = "Good afternoon";
 } else {
-    hourMessage = "Good night";
+    hourMessage = "Good evening";
 }
+// post control
+const [posts, setPosts] = useState<any[]>([]);
 
+useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const res = await fetch("/api/eventCreation");
+        if (!res.ok) throw new Error("Failed to fetch events");
+        const data = await res.json();
+        setPosts(data.events || []); 
+      } catch (error) {
+        console.error(error);
+      }
+    };
+  
+    fetchPosts();
+  }, []);
+
+  const filteredEvents = posts.filter((event) => {
+    const eventEndDate = new Date(event.endDate);
+    return event.isPublic && eventEndDate > new Date();
+  });
 return (
     <>
 
         <div className="container mx-auto p-6">
-            <h1 className="font-bold text-sky-800 text-3xl ml-3 mb-3">{hourMessage}, {session?.user?.name}!</h1>
+            <h1 className="font-bold text-sky-800 text-4xl ml-7 mb-3">{hourMessage}, <a href="/[userId]" className="text-5xl">{session?.user?.name}</a>!</h1>
             <div className="grid grid-cols-[2fr_1fr]">
                 <div className="grid-span-2 space-y-6">
                     {/* Top section */}
@@ -90,13 +112,17 @@ return (
                     {/* Explore section */}
                     <div className="p-4">
                         <h1 className="font-bold text-sky-800 text-3xl ml-3 mb-3">Explore</h1>
-                        <Post />              
+                        {filteredEvents.map((post) => (
+                        <Post key={post._id} post={post} />
+                        ))}           
                     </div>
                 </div>
                     {/* Hot section */}
                     <div className="p-4">
                         <h1 className="font-bold text-sky-800 text-3xl ml-3 mb-3">Hot</h1>
-                        <Post />  
+                        {filteredEvents.map((post) => (
+                        <Post key={post._id} post={post} />
+                        ))}    
                     </div>
             </div>
             <Footer />

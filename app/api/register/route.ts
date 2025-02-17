@@ -35,6 +35,17 @@ export async function POST(req: NextRequest) {
 
     }catch(error:any){
         return NextResponse.json({ error: error.message }, { status: 500})
-        console.log
     }
+}
+
+export async function GET(req: NextRequest) {
+    await connect();
+    
+    try{
+        const users = await User.find({})
+        return NextResponse.json({users});
+    } catch(error: any){
+        return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
 }

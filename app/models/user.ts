@@ -23,12 +23,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, "Please, write your password!"],
   },
-  events: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Event",
-    },
-  ],
+ 
 });
 
 const User = mongoose.models.User || mongoose.model("User", userSchema);

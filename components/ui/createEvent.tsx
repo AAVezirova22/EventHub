@@ -14,6 +14,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 
+import { useSession } from "next-auth/react";
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
@@ -21,22 +22,23 @@ export default function CreateEvent() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [startDate, setStartDate] = useState("");
-  const [startTime, setStartTime] = useState("");  // state for start time
+  const [startTime, setStartTime] = useState("");  
   const [endDate, setEndDate] = useState("");
   const [isPeopleLimitChecked, setIsPeopleLimitChecked] = useState(false);
-  const [guestLimit, setGuestLimit] = useState(""); 
+  const [guestLimit, setGuestLimit] = useState<number>(0);
   const [isEventPublic, setIsEventPublic] = useState(false);
+  const {data:session} = useSession();
 
-  function handleGuestChange(e) {
+  function handleGuestChange(e:any) {
     setIsPeopleLimitChecked(e.target.checked);
   }
 
-  function handlePrivacyChange(e) {
+  function handlePrivacyChange(e:any) {
     setIsEventPublic(e.target.checked);
   }
 
   // Handle the form submission
-  async function handleSubmit(e) {
+  async function handleSubmit(e:any) {
     e.preventDefault();
     const combinedStartDate = new Date(`${startDate}T${startTime}`);
 
@@ -47,7 +49,7 @@ export default function CreateEvent() {
       endDate: new Date(endDate).toISOString(),
       isPublic: isEventPublic,
       guestLimit: isPeopleLimitChecked ? guestLimit : 0,
-      userId: "670ee3c3d9456842cecbb399", 
+      
     };
     try {
       const response = await fetch("/api/eventCreation", {

@@ -12,7 +12,6 @@ export default function Home() {
   return (
     <>
       <Navbar />
-      {session && <span>{session.user?.name}</span>}
       {session ? <Dashboard />: null}
       
     </>

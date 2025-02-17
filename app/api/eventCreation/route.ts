@@ -40,20 +40,13 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   await connect(); // Ensure the database is connected
-
+  
   try {
-    const userId = req.nextUrl.searchParams.get("userId");
-    if (!userId) {
-      return NextResponse.json({ error: "Missing userId" }, { status: 400 });
-    }
+    const events = await Event.find({});
 
-    const user = await User.findById(userId).populate("events");
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-
-    return NextResponse.json({ events: user.events });
+    return NextResponse.json({ events });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+
