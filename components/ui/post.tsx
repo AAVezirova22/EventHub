@@ -38,24 +38,25 @@ interface PostProps {
     return (
       <div>
         <div className="ml-10">
-          <img src={post.image ? post.image : null} />
+          <img src={post.image ? post.image : ""}/>
           <p className="text-slate-600 font-bold text-[2vw]">
             {post.title.charAt(0).toUpperCase() + post.title.slice(1)} in {timeLeft} | {post.participants} participants
           </p>
-          <p className="text-slate-600 font-bold">
-            <img src={post.organizerImage || ""} alt="Organizer" />
-            {post.organizer}
-          </p>
-            {post.title.charAt(0).toUpperCase() + post.title.slice(1)} in {timeLeft} | {post.attending ? post.attending : "0"} participants
-          </p>
           <div className="flex items-center">
-          <img
-          src={post.createdByImage || "https://cdn.pfps.gg/pfps/2301-default-2.png"} className="w-8 h-8 rounded-full mr-2"/>
-          <p className="text-slate-600 font-bold">{post.createdByName}</p>
+            <p className="text-slate-600 font-bold">{post.organizer}</p>
+          </div>
+  
+          <div className="flex items-center">
+            <img
+              src={post.createdByImage || "https://cdn.pfps.gg/pfps/2301-default-2.png"}
+              alt="Created By"
+              className="w-8 h-8 rounded-full mr-2"
+            />
+            <p className="text-slate-600 font-bold">{post.createdByName}</p>
           </div>
           <p className="text-slate-500">{post.description}</p>
         </div>
-      
+      </div>
     );
   }
   // diff outlook of a post for in a person's profile history

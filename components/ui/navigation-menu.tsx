@@ -315,7 +315,7 @@ const [isOpen, setIsOpen] = useState(false);
                 <NavigationMenuItem>
                   
                   <a href="/[userId]"><Avatar className="ml-8 flex items-center  justify-center">
-                    <AvatarImage src="https://github.com/shadcn.png"></AvatarImage>
+                    <AvatarImage src={session?.user?.image ? session.user.image : "https://cdn.pfps.gg/pfps/2301-default-2.png"}></AvatarImage>
                     <AvatarFallback>{firstName?.at(0)?.toUpperCase()}</AvatarFallback> 
                     {/* this here ^ are the initials of the person which appear when the avatar does not load */}
                   </Avatar></a>
