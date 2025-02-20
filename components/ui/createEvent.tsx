@@ -37,11 +37,10 @@ export default function CreateEvent() {
     setIsEventPublic(e.target.checked);
   }
 
-  // Handle the form submission
   async function handleSubmit(e:any) {
     e.preventDefault();
     const combinedStartDate = new Date(`${startDate}T${startTime}`);
-
+   
     const eventData = {
       title,
       description,
@@ -49,7 +48,8 @@ export default function CreateEvent() {
       endDate: new Date(endDate).toISOString(),
       isPublic: isEventPublic,
       guestLimit: isPeopleLimitChecked ? guestLimit : 0,
-      
+      attending : 0,
+      userId : (session?.user as { id?: string })?.id?.toString(),
     };
     try {
       const response = await fetch("/api/eventCreation", {
@@ -70,7 +70,8 @@ export default function CreateEvent() {
       alert("Error creating event.");
     }
   }
-
+  console.log("Session data:", session);
+  console.log("Extracted userId:", (session?.user as { id?: string })?.id);
   return (
     <>
       <Dialog>

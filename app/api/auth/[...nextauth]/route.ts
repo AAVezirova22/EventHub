@@ -42,7 +42,7 @@ export const authOptions: NextAuthOptions = {
         if(user){
             token.email = user.email;
             token.name = user.name;
-
+            token.id = user.id;
 
         }
         return token;
@@ -50,7 +50,8 @@ export const authOptions: NextAuthOptions = {
     async session({session, token}:{session:any, token:any}){
         if(session.user){
             session.user.email = token.email;
-            session.user.name = token.name
+            session.user.name = token.name;
+            session.user.id = token.id;
         }
         console.log(session)
         return session

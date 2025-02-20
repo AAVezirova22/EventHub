@@ -1,13 +1,50 @@
 "use client"; 
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Navbar from "@/components/ui/navigation-menu";
+import { DateTime } from 'luxon';
+import { useEffect, useState } from "react";
+import { ProfilePost } from "@/components/ui/post";
 
 export default function UserProfile() {
     const router = useRouter();
     const {data:session} = useSession();
+    const [posts, setPosts] = useState<any[]>([]);
+    const [currentIndex, setCurrentIndex] = useState(0); 
+    
+    useEffect(() => {
+        const fetchPosts = async () => {
+          try {
+            const res = await fetch("/api/eventCreation");
+            if (!res.ok) throw new Error("Failed to fetch events");
+            const data = await res.json();
+            setPosts(data.events || []); 
+          } catch (error) {
+            console.error(error);
+          }
+        };
+      
+        fetchPosts();
+      }, []);
+    
+      const filteredEvents = posts.filter((event) => {
+        return event.createdByName == session?.user?.name ;
+      });
+      const eventsPerPage = 2;
+      const paginatedEvents = filteredEvents.slice(currentIndex, currentIndex + eventsPerPage);
+      const nextPage = () => {
+        if (currentIndex + eventsPerPage < filteredEvents.length) {
+            setCurrentIndex(currentIndex + eventsPerPage);
+        }
+    };
+
+    const prevPage = () => {
+        if (currentIndex - eventsPerPage >= 0) {
+            setCurrentIndex(currentIndex - eventsPerPage);
+        }
+    };
+
     const [file, setFile] = useState<File | null>(null);
     const [imageUrl, setImageUrl] = useState<string | null>(null);
 
@@ -68,7 +105,11 @@ export default function UserProfile() {
           <div className="mb-6">
             <h3 className="text-md font-medium mb-2">Created</h3>
             <div className="flex items-center gap-2">
-              
+            <button onClick={prevPage} disabled={currentIndex === 0} className={`text-2xl font-bold ${currentIndex === 0 ? 'text-gray-400 ' : 'text-slate-500  hover:text-slate-700'}`} >&lt;</button>
+            {paginatedEvents.map((post) => (
+            <ProfilePost key={post._id} post={post} />
+            ))}
+              <button onClick={nextPage} disabled={currentIndex + eventsPerPage >= filteredEvents.length} className={`text-2xl font-bold ${currentIndex + eventsPerPage >= filteredEvents.length ? 'text-gray-400 ' : 'text-slate-500  hover:text-slate-700'}`}>&gt;</button>                       
             </div>
           </div>
 

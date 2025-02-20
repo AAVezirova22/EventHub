@@ -8,6 +8,7 @@ const eventSchema = new mongoose.Schema({
   image: String,
   isPublic: Boolean,
   guestLimit: Number,
+  attending : Number,
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
