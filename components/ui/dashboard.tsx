@@ -111,11 +111,16 @@ return (
                     </div>
                     {/* Explore section */}
                     <div className="p-4">
-                        <h1 className="font-bold text-sky-800 text-3xl ml-3 mb-3">Explore</h1>
-                        {filteredEvents.map((post) => (
-                        <Post key={post._id} post={post} />
-                        ))}           
-                    </div>
+    <h1 className="font-bold text-sky-800 text-3xl ml-3 mb-3">Explore</h1>
+    {filteredEvents.map((post) => (
+        <div key={post._id}>
+        <Post post={post} />
+        <Link href={`/events/${post._id}`} className="text-blue-500 hover:underline">
+            More info
+        </Link>
+    </div>
+    ))}           
+</div>
                 </div>
                     {/* Hot section */}
                     <div className="p-4">
