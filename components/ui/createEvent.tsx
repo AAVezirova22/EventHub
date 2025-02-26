@@ -1,77 +1,120 @@
-'use client'
+'use client';
 
-import * as React from "react"
-import { useState } from "react";
-import { Button } from "@/components/ui/button"
+import * as React from 'react';
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogClose,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from '@/components/ui/dialog';
 
-import { useSession } from "next-auth/react";
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { useSession } from 'next-auth/react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 export default function CreateEvent() {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [startTime, setStartTime] = useState("");  
-  const [endDate, setEndDate] = useState("");
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [startTime, setStartTime] = useState('');
+  const [endDate, setEndDate] = useState('');
   const [isPeopleLimitChecked, setIsPeopleLimitChecked] = useState(false);
   const [guestLimit, setGuestLimit] = useState<number>(0);
   const [isEventPublic, setIsEventPublic] = useState(false);
-  const {data:session} = useSession();
+  const [image, setImage] = useState<File | null>(null);
+  const [loading, setLoading] = useState(false);
+  const { data: session } = useSession();
 
-  function handleGuestChange(e:any) {
+  function handleGuestChange(e: React.ChangeEvent<HTMLInputElement>) {
     setIsPeopleLimitChecked(e.target.checked);
   }
 
-  function handlePrivacyChange(e:any) {
+  function handlePrivacyChange(e: React.ChangeEvent<HTMLInputElement>) {
     setIsEventPublic(e.target.checked);
   }
 
-  async function handleSubmit(e:any) {
+  function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+
+      // Validate image type and size (Max: 2MB, Allowed: JPG, PNG, WebP)
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+      if (!allowedTypes.includes(file.type)) {
+        alert('Only JPG, PNG, and WebP images are allowed.');
+        return;
+      }
+      if (file.size > 2 * 1024 * 1024) {
+        alert('Image must be smaller than 2MB.');
+        return;
+      }
+
+      setImage(file);
+    }
+  }
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const combinedStartDate = new Date(`${startDate}T${startTime}`);
-   
-    const eventData = {
-      title,
-      description,
-      startDate: combinedStartDate.toISOString(), 
-      endDate: new Date(endDate).toISOString(),
-      isPublic: isEventPublic,
-      guestLimit: isPeopleLimitChecked ? guestLimit : 0,
-      attending : 0,
-      userId : (session?.user as { id?: string })?.id?.toString(),
-    };
+
+    // Validate required fields
+    if (!title || !description || !startDate || !endDate) {
+      alert('Please fill in all required fields.');
+      return;
+    }
+
+    setLoading(true);
+
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('description', description);
+    formData.append('startDate', combinedStartDate.toISOString());
+    formData.append('endDate', new Date(endDate).toISOString());
+    formData.append('isPublic', JSON.stringify(isEventPublic));
+    formData.append('guestLimit', isPeopleLimitChecked ? guestLimit.toString() : '0');
+    formData.append('attending', '0');
+    formData.append('userId', (session?.user as { id?: string })?.id?.toString() || '');
+
+    if (image) {
+      formData.append('image', image);
+    }
+
     try {
-      const response = await fetch("/api/eventCreation", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(eventData),
+      const response = await fetch('/api/eventCreation', {
+        method: 'POST',
+        body: formData, // Do not set Content-Type; browser sets it automatically
       });
 
       if (response.ok) {
-        alert("Event created successfully!");
+        const data = await response.json();
+        alert('Event created successfully!');
+        console.log('Event Created:', data);
+
+        // Reset form fields after successful submission
+        setTitle('');
+        setDescription('');
+        setStartDate('');
+        setStartTime('');
+        setEndDate('');
+        setIsPeopleLimitChecked(false);
+        setGuestLimit(0);
+        setIsEventPublic(false);
+        setImage(null);
       } else {
-        alert("Failed to create event.");
+        const errorData = await response.json();
+        alert(`Failed to create event: ${errorData.error || 'Unknown error'}`);
       }
     } catch (error) {
-      console.error("Error creating event:", error);
-      alert("Error creating event.");
+      console.error('Error creating event:', error);
+      alert('Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
     }
   }
-  console.log("Session data:", session);
-  console.log("Extracted userId:", (session?.user as { id?: string })?.id);
+
   return (
     <>
       <Dialog>
@@ -84,84 +127,84 @@ export default function CreateEvent() {
           </button>
         </DialogTrigger>
         <DialogContent className="max-w-md p-6 rounded-xl shadow-md bg-white space-y-4">
-          <DialogHeader>
-            <input
-              type="text"
-              placeholder="Title"
-              className="w-full border-b pb-2 text-lg font-semibold focus:outline-none"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
+          <form onSubmit={handleSubmit}>
+            <DialogHeader>
+              <input
+                type="text"
+                placeholder="Title"
+                className="w-full border-b pb-2 text-lg font-semibold focus:outline-none"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+              />
+              <p className="text-gray-500 text-sm mt-5">
+                This is a {isEventPublic ? "public" : "private"} event
+              </p>
+            </DialogHeader>
+            <textarea
+              placeholder="Description"
+              className="w-full h-20 border rounded-md p-2"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
             />
-            <p className="text-gray-500 text-sm mt-5">This is a {isEventPublic ? "public" : "private"} event</p>
-          </DialogHeader>
-          <textarea
-            placeholder="Description"
-            className="w-full h-20 border rounded-md p-2"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-          <div className="grid grid-cols-2 gap-4">
             <input
               type="date"
-              placeholder="Start date"
               className="w-full border rounded-md p-2"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
             />
             <input
               type="date"
-              placeholder="End date"
               className="w-full border rounded-md p-2"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
             />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <Input
+            <input
               type="time"
+              className="w-full border rounded-md p-2 text-gray-700"
               value={startTime}
               onChange={(e) => setStartTime(e.target.value)}
-              className="w-full border rounded-md p-2 text-gray-700 placeholder-gray-400"
             />
-          </div>
-          <div className="border rounded-md p-2 cursor-pointer text-gray-500 relative">
-            <span>Add image...</span>
-            <input type="file" className="absolute inset-0 opacity-0 w-full h-full cursor-pointer" />
-          </div>
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              id="peopleLimit"
-              className="w-4 h-4 border rounded-md"
-              checked={isPeopleLimitChecked}
-              onChange={handleGuestChange}
-            />
-            <Label htmlFor="peopleLimit" className="text-gray-700">Guest limit</Label>
-            {isPeopleLimitChecked && (
+            <div className="border rounded-md p-2 cursor-pointer text-gray-500 relative">
+              <span>Add image...</span>
+              <input type="file" className="absolute inset-0 opacity-0 w-full h-full cursor-pointer" onChange={handleImageChange} />
+            </div>
+            <div className="flex items-center gap-2">
               <input
-                type="number"
-                className="w-16 border rounded-md p-1 text-center text-slate-700"
-                value={guestLimit}
-                onChange={(e) => setGuestLimit(Number(e.target.value))}
+                type="checkbox"
+                id="peopleLimit"
+                className="w-4 h-4 border rounded-md"
+                checked={isPeopleLimitChecked}
+                onChange={handleGuestChange}
               />
-            )}
-          </div>
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              id="public"
-              className="w-4 h-4 border rounded-md"
-              checked={isEventPublic}
-              onChange={handlePrivacyChange}
-            />
-            <Label htmlFor="public" className="text-gray-700">Public</Label>
-          </div>
-          <DialogFooter className="flex justify-end gap-2">
-            <DialogClose asChild>
-              <Button variant="outline" className="border rounded-md px-4 py-2">Cancel</Button>
-            </DialogClose>
-            <Button className="bg-black text-white rounded-md px-4 py-2" onClick={handleSubmit}>Done</Button>
-          </DialogFooter>
+              <Label htmlFor="peopleLimit" className="text-gray-700">Guest limit</Label>
+              {isPeopleLimitChecked && (
+                <input
+                  type="number"
+                  className="w-16 border rounded-md p-1 text-center text-slate-700"
+                  value={guestLimit}
+                  onChange={(e) => setGuestLimit(Number(e.target.value))}
+                />
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="public"
+                className="w-4 h-4 border rounded-md"
+                checked={isEventPublic}
+                onChange={handlePrivacyChange}
+              />
+              <Label htmlFor="public" className="text-gray-700">Public</Label>
+            </div>
+            <DialogFooter className="flex justify-end gap-2">
+              <DialogClose asChild>
+                <Button variant="outline">Cancel</Button>
+              </DialogClose>
+              <Button type="submit" className="bg-black text-white rounded-md px-4 py-2" disabled={loading}>
+                {loading ? "Submitting..." : "Done"}
+              </Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
     </>

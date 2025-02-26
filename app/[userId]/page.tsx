@@ -92,24 +92,25 @@ export default function UserProfile() {
         }
     }
 };
-const [countries, setCountries] = useState<any[]>([]);
+const [countries, setCountries] = useState([]);
 const [regions, setRegions] = useState([]);
-const [selectedCountry, setSelectedCountry] = useState("");
-const [selectedRegion, setSelectedRegion] = useState("");
-    
+
 useEffect(() => {
   const fetchCountries = async () => {
     try {
       const response = await fetch("https://restcountries.com/v3.1/all");
       const data = await response.json();
-      
-      const countryList = data.map((country: any) => ({
-        code: country.cca2, 
+      const countryList = data.map((country : any) => ({
+        code: country.cca2,  // Country code
         name: country.name.common,
-        subregion: country.subregion || "", // Handle missing subregion
+        region: country.region,
+        subregions: country.subregion ? [country.subregion] : [],
       }));
       
-      setCountries(countryList.sort((a: any, b: any) => a.name.localeCompare(b.name)));
+      const sortedCountries = countryList.sort((a :any , b : any) => {
+        return a.name.localeCompare(b.name);
+      });
+      setCountries(sortedCountries);
     } catch (error) {
       console.error("Error fetching countries:", error);
     }
@@ -117,15 +118,6 @@ useEffect(() => {
 
   fetchCountries();
 }, []);
-
-useEffect(() => {
-  if (selectedCountry) {
-      const country = countries.find(c => c.code === selectedCountry);
-      setRegions(country?.subregions || []);
-
-  }
-}, [selectedCountry, countries]);
-
 
   
     return(
@@ -161,25 +153,14 @@ useEffect(() => {
         {/* Right Side - Events Section */}
         <section className="max-w-lg mx-auto my-8 p-6 bg-white rounded-md ">
         <h1 className="text-2xl text-gray-500 font-semibold mb-6">Edit your personal information</h1>
-      {/* First Name */}
+      
+      {/* Full Name */}
       <div className="mb-4 flex gap-5">
-  <label className="text-lg mt-2">First Name</label>
+  <label className="text-lg mt-2">Full Name</label>
   <div className="flex items-center space-x-2">
     <input
       type="text"
-      placeholder={session?.user?.name || "ex: John"}
-      className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none"
-    />
-  </div>
-</div>
-
-      {/* Last Name */}
-      <div className="mb-4 flex gap-5">
-  <label className="text-lg mt-2">Last Name</label>
-  <div className="flex items-center space-x-2">
-    <input
-      type="text"
-      placeholder={(session?.user as { lastName?: string })?.lastName?.toString() || "ex: Doe"}
+      placeholder={session?.user?.name || "Full Name"}
       className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none"
     />
   </div>
@@ -187,11 +168,11 @@ useEffect(() => {
 
       {/* Email */}
       <div className="mb-4 flex gap-5">
-        <label className="text-lg mt-2">Username</label>
+        <label className="text-lg mt-2">Email</label>
         <div className="flex items-center space-x-2">
           <input
-            type="text"
-            placeholder={(session?.user as { username?: string })?.username?.toString() || ""}
+            type="email"
+            placeholder="example@gmail.com"
             className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none"
           />
         </div>
@@ -227,31 +208,27 @@ useEffect(() => {
         </div>
       </div>
 
-       {/* Region Selector (Dynamic Based on Country) */}
-       <div className="mb-4 flex gap-5">
+      {/* Region Selector (Dynamic Based on Country) */}
+      <div className="mb-4 flex gap-5">
         <label className="text-lg mt-2">State/Province/Region</label>
         <div className="flex items-center space-x-2">
-        <select
-  className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none"
-  value={selectedRegion}
-  onChange={(e) => setSelectedRegion(e.target.value)}
-  disabled={regions.length === 0}
->
-  <option value="">
-    {regions.length > 0 ? "Select a region" : "No regions available"}
-  </option>
-  {regions.map((region, index) => (
-    <option key={index} value={region}>
-      {region}
-    </option>
-  ))}
-</select>
+          <select
+            className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none"
+            defaultValue=""
+            disabled={regions.length === 0} // Disable if no regions
+          >
+            <option value="">
+              {regions.length > 0 ? "Select a region" : "No regions available"}
+            </option>
+            {regions.map((region, index) => (
+              <option key={index} value={region}>
+                {region}
+              </option>
+            ))}
+          </select>
         </div>
-    </div>
-    {/* Display Selected Region */}
-    {selectedRegion && (
-        <p className="text-gray-500 text-sm mb-4">Selected Region: {selectedRegion}</p>
-    )}
+      </div>
+
       {/* Birthday */}
       <div className="mb-4 flex gap-5">
         <label className="text-lg mt-2">Birthday</label>
@@ -296,6 +273,7 @@ useEffect(() => {
             defaultValue=""
           >
             <option value="">Year</option>
+            {/* Example range: 1985 - 2024 */}
             {Array.from({ length: 40 }, (_, i) => 1985 + i).map((year) => (
               <option key={year} value={year}>
                 {year}
@@ -313,7 +291,7 @@ useEffect(() => {
             type="checkbox"
             className="h-4 w-4"
           />
-          <span className="text-sm">I agree to receive emails from the EventHub team</span>
+          <span className="text-sm">I agree to receive emails from EventHub</span>
         </div>
       </div>
 
