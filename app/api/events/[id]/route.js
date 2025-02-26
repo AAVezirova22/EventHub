@@ -1,5 +1,5 @@
 import { connect } from "@/app/config/dbConfig";
-import { ObjectId } from 'mongodb';
+import { ObjectId } from "mongodb";
 
 export async function GET(req, { params }) {
     try {
