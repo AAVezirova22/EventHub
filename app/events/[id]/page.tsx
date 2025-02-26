@@ -6,60 +6,57 @@ import axios from "axios";
 import { Button } from "@/components/ui/button";
 
 interface Event {
+    _id: string;
     name: string;
     createdByName: string;
-    date: string;
+    startDate: string; // Stored as an ISODate in MongoDB
     description: string;
 }
 
 export default function EventDetails() {
     const { id } = useParams();
     const [event, setEvent] = useState<Event | null>(null);
-    //const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [joining, setJoining] = useState(false);
 
-
-// useEffect(() => {
-//       try {
-//         const res = await fetch("/api/eventCreation");
-//         if (!res.ok) throw new Error("Failed to fetch events");
-//         const data = await res.json();
-//         setPosts(data.events || []); 
-//       } catch (error) {
-//         console.error(error);
-//       }
-//     };
-  
-//     fetchPosts();
-//   }, []);
-
-useEffect(() => {
-        const fetchEvent = async () => {
+    useEffect(() => {
+        const fetchEvents = async () => {
             try {
-                const response = await fetch("/api/eventCreation");
-                if (!response.ok) throw new Error("Failed to fetch events");
-                const data = await response.json();
-                setEvent(data.events || []); 
-                const currentEvent = data.events.find((event: any) => event._id === id);
-                //setEvent(currentEvent || [] );
+                console.log("Fetching all events...");
+                const response = await axios.get("/api/eventCreation");
+
+                if (!response.data.events || response.data.events.length === 0) {
+                    throw new Error("No events found");
+                }
+
+                console.log("All events fetched:", response.data.events);
+
+                // Find the event that matches the id from URL
+                const currentEvent = response.data.events.find((event: Event) => event._id === id);
+
+                if (!currentEvent) {
+                    throw new Error("Event not found");
+                }
+
+                console.log("Current event found:", currentEvent);
+                setEvent(currentEvent);
             } catch (error) {
-                console.error('Error fetching event:', error);
-                setError('Error fetching event');
-                //setLoading(false);
+                console.error("Error fetching event:", error);
+                setError("Error fetching event");
             }
         };
 
-        fetchEvent();
-}, [id]);
-
+        if (id) {
+            fetchEvents();
+        }
+    }, [id]);
 
     const handleJoin = async () => {
         setJoining(true);
         try {
             const response = await axios.post(`/api/events/${id}/join`);
             if (response.status === 200) {
-                window.location.href = "/profile"; // Redirect to profile page
+                window.location.href = "/profile";
             } else {
                 console.error("Failed to join event");
             }
@@ -70,27 +67,42 @@ useEffect(() => {
         }
     };
 
-    // if (loading) {
-    //     return <div>Loading...</div>;
-    // }
-
     if (error) {
         return <div>{error}</div>;
     }
 
     if (!event) {
-        return <div>No event found</div>;
+        return <div>Loading event...</div>;
     }
+
+    // 🛠 Fixing Date Handling
+    console.log("Raw event startDate from MongoDB:", event.startDate);
+
+    const eventDate = event.startDate ? new Date(event.startDate) : null;
+    console.log("Parsed event date:", eventDate);
+    console.log("Full event object:", event);
 
     return (
         <div className="min-h-screen bg-gray-200 flex justify-center items-center p-8">
             <div className="bg-white shadow-lg rounded-xl w-full max-w-4xl p-8">
                 <h1 className="font-bold text-3xl mb-4">{event.name}</h1>
-                <p className="text-gray-700 mb-2">Created by: {event.createdByName}</p>
-                <p className="text-gray-700 mb-2">Date: {new Date(event.date).toLocaleDateString()}</p>
-                <p className="text-gray-700 mb-2">Time: {new Date(event.date).toLocaleTimeString()}</p>
-                <p className="text-gray-700 mb-4">{event.description}</p>
-                <Button onClick={handleJoin} disabled={joining} className="bg-indigo-700 text-white px-4 py-2 rounded-3xl">
+                <p className="text-gray-700 mb-2">
+                    Created by: {event.createdByName || "Unknown"}
+                </p>
+                <p className="text-gray-700 mb-2">
+                    Date: {eventDate ? eventDate.toLocaleDateString("en-GB") : "Date not available"}
+                </p>
+                <p className="text-gray-700 mb-2">
+                    Time: {eventDate ? eventDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "Time not available"}
+                </p>
+                <p className="text-gray-700 mb-4">
+                    Description: {event.description}
+                </p>
+                <Button
+                    onClick={handleJoin}
+                    disabled={joining}
+                    className="bg-indigo-700 text-white px-4 py-2 rounded-3xl"
+                >
                     {joining ? "Joining..." : "Join"}
                 </Button>
             </div>
