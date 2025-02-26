@@ -92,6 +92,33 @@ export default function UserProfile() {
         }
     }
 };
+const [countries, setCountries] = useState([]);
+const [regions, setRegions] = useState([]);
+
+useEffect(() => {
+  const fetchCountries = async () => {
+    try {
+      const response = await fetch("https://restcountries.com/v3.1/all");
+      const data = await response.json();
+      const countryList = data.map((country : any) => ({
+        code: country.cca2,  // Country code
+        name: country.name.common,
+        region: country.region,
+        subregions: country.subregion ? [country.subregion] : [],
+      }));
+      
+      const sortedCountries = countryList.sort((a :any , b : any) => {
+        return a.name.localeCompare(b.name);
+      });
+      setCountries(sortedCountries);
+    } catch (error) {
+      console.error("Error fetching countries:", error);
+    }
+  };
+
+  fetchCountries();
+}, []);
+
   
     return(
         <>
@@ -167,27 +194,38 @@ export default function UserProfile() {
       <div className="mb-4 flex gap-5">
         <label className="text-lg mt-2">Country</label>
         <div className="flex items-center space-x-2">
-          <select
-            className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none"
-            defaultValue=""
-          >
-            <option value="">Not chosen</option>
-            <option value="USA">United States</option>
-            <option value="Canada">Canada</option>
-            {/* Add more countries as needed */}
-          </select>
+        <select
+          className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none"
+          defaultValue=""
+        >
+          <option value="">Not chosen</option>
+          {countries.map((country : any) => (
+            <option key={country.code} value={country.code}>
+              {country.name}
+            </option>
+          ))}
+        </select>
         </div>
       </div>
 
-      {/* State/Province/Region */}
+      {/* Region Selector (Dynamic Based on Country) */}
       <div className="mb-4 flex gap-5">
         <label className="text-lg mt-2">State/Province/Region</label>
         <div className="flex items-center space-x-2">
-          <input
-            type="text"
-            placeholder="Type here"
+          <select
             className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none"
-          />
+            defaultValue=""
+            disabled={regions.length === 0} // Disable if no regions
+          >
+            <option value="">
+              {regions.length > 0 ? "Select a region" : "No regions available"}
+            </option>
+            {regions.map((region, index) => (
+              <option key={index} value={region}>
+                {region}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 
