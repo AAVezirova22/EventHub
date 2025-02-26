@@ -68,7 +68,7 @@ export default function SignUp() {
 
   // Actual form submission
   const handleSubmit = async (e: any) => {
-    e.preventDefault(); // Make sure the default form action is prevented
+
     setLoading(true);
 
     try {

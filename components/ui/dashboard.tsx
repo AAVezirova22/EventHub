@@ -115,9 +115,9 @@ return (
     {filteredEvents.map((post) => (
         <div key={post._id}>
         <Post post={post} />
-        <Link href={`/events/${post._id}`} className="text-blue-500 hover:underline">
-            More info
-        </Link>
+        <a href={`/events/[id]${post._id.toString()}`} className="text-blue-500 hover:underline">
+    More info
+</a>
     </div>
     ))}           
 </div>
