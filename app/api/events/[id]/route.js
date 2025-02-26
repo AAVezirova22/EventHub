@@ -1,4 +1,4 @@
-import { connectToDatabase } from '@/utils/mongodb';
+import { connect } from "@/app/config/dbConfig";
 import { ObjectId } from 'mongodb';
 
 export async function GET(req, { params }) {
@@ -9,7 +9,7 @@ export async function GET(req, { params }) {
             return new Response(JSON.stringify({ message: "Invalid event ID" }), { status: 400 });
         }
 
-        const { db } = await connectToDatabase();
+        const { db } = await connect();
         const event = await db.collection("events").findOne({ _id: new ObjectId(id) });
 
         if (!event) {
