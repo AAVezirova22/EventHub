@@ -9,7 +9,7 @@ interface Event {
     _id: string;
     name: string;
     createdByName: string;
-    date: string;
+    startDate: string; // Stored as an ISODate in MongoDB
     description: string;
 }
 
@@ -75,17 +75,34 @@ export default function EventDetails() {
         return <div>Loading event...</div>;
     }
 
-    const eventDate = event.date ? new Date(event.date) : null;
+    // 🛠 Fixing Date Handling
+    console.log("Raw event startDate from MongoDB:", event.startDate);
+
+    const eventDate = event.startDate ? new Date(event.startDate) : null;
+    console.log("Parsed event date:", eventDate);
+    console.log("Full event object:", event);
 
     return (
         <div className="min-h-screen bg-gray-200 flex justify-center items-center p-8">
             <div className="bg-white shadow-lg rounded-xl w-full max-w-4xl p-8">
                 <h1 className="font-bold text-3xl mb-4">{event.name}</h1>
-                <p className="text-gray-700 mb-2">Created by: {event.createdByName || "Unknown"}</p>
-                <p className="text-gray-700 mb-2">Date: {eventDate ? eventDate.toLocaleDateString() : "Invalid Date"}</p>
-                <p className="text-gray-700 mb-2">Time: {eventDate ? eventDate.toLocaleTimeString() : "Invalid Time"}</p>
-                <p className="text-gray-700 mb-4">{event.description}</p>
-                <Button onClick={handleJoin} disabled={joining} className="bg-indigo-700 text-white px-4 py-2 rounded-3xl">
+                <p className="text-gray-700 mb-2">
+                    Created by: {event.createdByName || "Unknown"}
+                </p>
+                <p className="text-gray-700 mb-2">
+                    Date: {eventDate ? eventDate.toLocaleDateString("en-GB") : "Date not available"}
+                </p>
+                <p className="text-gray-700 mb-2">
+                    Time: {eventDate ? eventDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "Time not available"}
+                </p>
+                <p className="text-gray-700 mb-4">
+                    Description: {event.description}
+                </p>
+                <Button
+                    onClick={handleJoin}
+                    disabled={joining}
+                    className="bg-indigo-700 text-white px-4 py-2 rounded-3xl"
+                >
                     {joining ? "Joining..." : "Join"}
                 </Button>
             </div>
