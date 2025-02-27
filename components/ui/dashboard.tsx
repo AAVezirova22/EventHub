@@ -62,7 +62,11 @@ export default function Dashboard() {
 
   const filteredEvents = posts.filter((event) => {
     const eventEndDate = new Date(event.endDate);
-    return event.isPublic && eventEndDate > new Date();
+    return (
+      event.isPublic &&
+      eventEndDate > new Date() &&
+      event.status === "approved"
+    );
   });
   return (
     <>

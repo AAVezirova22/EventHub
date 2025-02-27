@@ -69,7 +69,7 @@ export default function AdminPostsPage() {
           <div key={post._id} style={{ border: "1px solid #ccc", margin: "10px 0" }}>
             <h2>{post.title}</h2>
             <p>{post.content}</p>
-            <button onClick={() => handleApprove(post._id)}>Approve</button>
+            <button onClick={() => handleApprove(post._id)}>Approve</button><br /> 
             <button onClick={() => handleReject(post._id)}>Reject</button>
           </div>
         ))
