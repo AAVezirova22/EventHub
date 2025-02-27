@@ -59,7 +59,6 @@ interface PostProps {
       </div>
     );
   }
-  // diff outlook of a post for in a person's profile history
 
   export function ProfilePost({ post }: PostProps) {
     const dt = DateTime.now();
@@ -77,7 +76,7 @@ function calcTimeLeft() {
   } else if (diffInHours < 1 && diffInMins > 0) {
     return ` in ${Math.floor(diffInMins)} minute${Math.floor(diffInMins) > 1 ? 's' : ''}`;
   } else {
-    // Handle past events
+
     if (Math.abs(diffInDays) >= 1) {
       return `${Math.abs(Math.floor(diffInDays))} day${Math.abs(Math.floor(diffInDays)) > 1 ? 's' : ''} ago`;
     } else if (Math.abs(diffInHours) >= 1) {

@@ -7,7 +7,6 @@ export async function GET(request: Request, { params }: any) {
     await connect();
     const { id } = params;
     const event = await Event.findById(id).populate("attendees"); 
-    // or just .findById(id) if you don't need user details
 
     if (!event) {
       return NextResponse.json({ error: "Event not found" }, { status: 404 });

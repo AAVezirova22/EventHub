@@ -10,7 +10,7 @@ interface Event {
 }
 
 export default function AttendingEvents() {
-  const { data: session } = useSession(); // ✅ Get logged-in user
+  const { data: session } = useSession();
   const [attendingEvents, setAttendingEvents] = useState<Event[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -24,7 +24,7 @@ export default function AttendingEvents() {
         if (!res.ok) throw new Error("Failed to fetch attending events");
 
         const data = await res.json();
-        setAttendingEvents(data.events || []); // Ensure it's an array
+        setAttendingEvents(data.events || []); 
       } catch (error) {
         console.error("Error fetching attending events:", error);
       } finally {

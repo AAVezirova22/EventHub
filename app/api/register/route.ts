@@ -4,7 +4,7 @@ import bcryptjs from "bcryptjs";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
-    console.log("Register API hit"); // Add this
+    console.log("Register API hit");
     await connect();
     try {
         const { name, lastName, email, username, password } = await req.json();

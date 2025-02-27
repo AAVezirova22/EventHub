@@ -17,7 +17,6 @@ const eventSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
-    // Add an array to store user IDs who have joined
     attendees: [
       {
         type: mongoose.Schema.Types.ObjectId,

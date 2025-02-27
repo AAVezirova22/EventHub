@@ -16,9 +16,8 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react"; //  <-- Import signIn from next-auth
+import { signIn } from "next-auth/react";
 
-// Relaxed validation schema (all optional)
 const signUpValidation = z.object({
   name: z.string().optional(),
   lastName: z.string().optional(),
@@ -30,7 +29,6 @@ const signUpValidation = z.object({
 export let isAuthentic: boolean = false;
 
 export default function SignUp() {
-  // React Hook Form setup
   const form = useForm<z.infer<typeof signUpValidation>>({
     resolver: zodResolver(signUpValidation),
     defaultValues: {
@@ -54,25 +52,21 @@ export default function SignUp() {
 
   const router = useRouter();
 
-  // Local state updates for each field
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setUser((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Not used to submit via react-hook-form, but for demonstration
   function onSubmit(values: z.infer<typeof signUpValidation>) {
     console.log("Form values from RHF:", values);
     console.log("Local user state:", user);
   }
 
-  // Actual form submission
   const handleSubmit = async (e: any) => {
 
     setLoading(true);
 
     try {
-      // Simple validation
       if (
         !user.name ||
         !user.lastName ||
@@ -250,7 +244,6 @@ export default function SignUp() {
               onClick={() =>
                 signIn("google", {
                   callbackUrl: "/",
-                  // optional: 'prompt: "select_account"' to force choose account
                   prompt: "select_account",
                 })
               }

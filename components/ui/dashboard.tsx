@@ -42,7 +42,7 @@ export default function Dashboard() {
   } else {
     hourMessage = "Good evening";
   }
-  // post control
+
   const [posts, setPosts] = useState<any[]>([]);
 
   useEffect(() => {
@@ -117,9 +117,9 @@ export default function Dashboard() {
                   <h1 className="font-bold text-sky-800 text-3xl ml-3 mb-3">
                     Finished
                   </h1>
-                  <button className="text-slate-400 text-center hover:text-slate-700">
-                    Show all
-                  </button>
+                  <Link href="/finished-events">
+                    <button className="text-blue-500 hover:underline">Show All</button>
+                  </Link>
                 </div>
                 <div className="flex gap-3 items-center">
                   {/* message bubble */}

@@ -34,8 +34,6 @@ export default function EventDetails() {
   useEffect(() => {
     const fetchEventData = async () => {
       try {
-        // For demonstration, your code fetches /api/eventCreation (returns { events: [...] })
-        // Then finds the event by ID.
         console.log("Fetching all events from /api/eventCreation...");
         const response = await axios.get("/api/eventCreation");
         
@@ -43,7 +41,6 @@ export default function EventDetails() {
           throw new Error("No events found");
         }
 
-        // Find the single event
         const currentEvent = response.data.events.find((evt: Event) => evt._id === id);
 
         if (!currentEvent) {
@@ -52,7 +49,6 @@ export default function EventDetails() {
 
         setEvent(currentEvent);
 
-        // Check if user is in event.attendees
         const userId = (session?.user as CustomSessionUser)?.id;
         if (userId && currentEvent.attendees?.includes(userId)) {
           setHasJoined(true);
@@ -82,14 +78,11 @@ export default function EventDetails() {
 
     setJoining(true);
     try {
-      // POST to /api/events/[id]/join with { userId }
       const response = await axios.post(`/api/events/${id}/join`, { userId });
 
       if (response.status === 200) {
-        // Mark as joined
         setHasJoined(true);
 
-        // Also update local event data so we see incremented 'attending'
         setEvent((prev) =>
           prev
             ? {
