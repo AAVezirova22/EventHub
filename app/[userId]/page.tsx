@@ -7,10 +7,16 @@ import { DateTime } from 'luxon';
 import { useEffect, useState } from "react";
 import { ProfilePost } from "@/components/ui/post";
 import { signOut } from "next-auth/react"
+import User from "../models/user";
+import { getToken } from "next-auth/jwt";
+import { param } from "jquery";
 
 export default function UserProfile() {
     const router = useRouter();
     const {data:session} = useSession();
+    const [userSession, setUserSession] = useState(Object);
+    const [imageSrc, setImageSrc] = useState('');
+    // const token = getToken({req: param});
     const [posts, setPosts] = useState<any[]>([]);
     const [attendingEvents, setAttendingEvents] = useState<any[]>([]);
     const userId = session?.user?.id;
@@ -71,41 +77,22 @@ export default function UserProfile() {
         }
     };
 
-    const [file, setFile] = useState<File | null>(null);
     const [imageUrl, setImageUrl] = useState<string | null>(null);
 
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-      if (event.target.files && event.target.files.length > 0) {
-          setFile(event.target.files[0]);
-      }
-  };
+    ;
 
-  const handleUpload = async () => {
-    if (file) {
-        const formData = new FormData();
-        formData.append("file", file);
-
-        try {
-            const response = await fetch("/api/upload", {
-                method: "POST",
-                body: formData,
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                setImageUrl(data.imageUrl);
-            } else {
-                console.error("Upload failed");
-            }
-        } catch (error) {
-            console.error("Error uploading file:", error);
-        }
-    }
-};
+  
 const [countries, setCountries] = useState([]);
 const [regions, setRegions] = useState([]);
+const [fileUrl, setFileUrl] = useState<string | null>(null);
 
 useEffect(() => {
+  if(session) {
+    console.log("Client side: ", session)
+    setUserSession(session);
+    setImageSrc(session?.user?.image || '');
+  }
+  
   const fetchCountries = async () => {
     try {
       const response = await fetch("https://restcountries.com/v3.1/all");
@@ -125,11 +112,85 @@ useEffect(() => {
       console.error("Error fetching countries:", error);
     }
   };
-
   fetchCountries();
-}, []);
+}, [session]);
 
+// useEffect(() => {
+//   getUserById();
+// }, [fileUrl]) 
+
+const [file, setFile] = useState<File | null>(null);
+
+const [previewUrl, setPreviewUrl] = useState<string | null>(session?.user?.image || null);
+const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  // const file = event.target.files?.[0];
+  // if (file) {
+  //   setFile(file);
+  //   setPreviewUrl(URL.createObjectURL(file)); // Preview before uploading
+  // }
+  let file = event.target.files?.[0];
+  if (file) {
+    toBase64(file).then((res: any) => {
+      if(res) {
+        setFileUrl(res);
+      }
+    })
+  }
+};
+
+const handleUpload = async () => {
+  if (!fileUrl) return;
+
+  const formData = new FormData();
+  formData.append("image", fileUrl || "");
+
+  try {
+    const response = await fetch("/api/register", {
+      method: "PATCH",
+      body: formData,
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to update profile picture");
+    }
+
+    const data = await response.json();
+    console.log("Profile pic updated:", data);
+
+    await fetch("/api/auth/session?update=true"); 
+
+    setPreviewUrl(data.imageUrl); // Update preview
+  } catch (error) {
+    console.error("Error:", error);
+  }
+};
+// const getUserById = async () => {
   
+//   try {
+//     const url: any = "" + new URLSearchParams({ foo: 'value', bar: 2, }).toString();
+//     const response = await fetch("/api/register/GetUserById", {
+//       method: "GET",
+//       body: session?.user.email || "",
+//       credentials: "include",
+//     });
+
+//     if (!response.ok) {
+//       throw new Error("Failed to update profile picture");
+//     }
+//   } catch (error) {
+//     console.error("Error:", error);
+//   }
+// };
+
+
+const toBase64 = (file:any) => new Promise((resolve, reject) => {
+  const reader = new FileReader();
+  reader.readAsDataURL(file);
+  reader.onload = () => resolve(reader.result);
+  reader.onerror = error => reject(error);
+});
+
     return(
         <>
             <Navbar />
@@ -142,8 +203,7 @@ useEffect(() => {
         <div className="w-24 h-24 rounded-full mb-4">
           
             <img
-              src={session?.user?.image ? session.user.image : "https://cdn.pfps.gg/pfps/2301-default-2.png"}
-              alt="User Avatar"
+              // src={userSession?.user.image ? userSession?.user.image : "https://cdn.pfps.gg/pfps/2301-default-2.png"}
               className="w-full h-full rounded-full object-cover"
             />
           </div>
@@ -162,8 +222,22 @@ useEffect(() => {
         <>
         {/* Right Side - Events Section */}
         <section className=" mx-auto my-8 p-6 bg-white rounded-md ">
-        <h1 className="text-2xl text-gray-500 font-semibold mb-6">Edit your personal information</h1>
+        <h1 className="text-2xl text-gray-500 font-semibold mb-6">{}</h1>
+        <div className="flex gap-5">
+            <div className="w-24 h-24 rounded-full mb-4">
+            
+              <img
+              
+              src={fileUrl ? fileUrl : "https://cdn.pfps.gg/pfps/2301-default-2.png"}
+              className="w-full h-full rounded-full object-cover"
+              />
+            </div>
+
+             <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" id="fileInput" /> 
+            <button onClick={() => document.getElementById('fileInput')?.click()} className="bg-indigo-700 h-10 text-white px-4 py-2 rounded-3xl cursor-pointer">{session?.user?.image ? "Edit profile pic" :  "Add profile pic"}</button>
+        </div>
       <div className="flex gap-5">
+        
       {/* First Name */}
       <div className="mb-4 flex gap-5">
   <label className="text-lg mt-2">First Name</label>
@@ -321,7 +395,7 @@ useEffect(() => {
         {/* Empty label just for layout consistency */}
         <label className="text-lg mt-2"></label>
         <div className="flex items-center space-x-2">
-          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+          <button onClick={handleUpload} className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
             Save
           </button>
         </div>

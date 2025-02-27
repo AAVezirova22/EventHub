@@ -6,12 +6,13 @@ import { Toaster } from "react-hot-toast";
 
 export default function ClientWrapper({ children }: { children: React.ReactNode }) {
   return (
-
-    <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}>
+      <>
+    <GoogleOAuthProvider clientId={process.env.GOOGLE_CLIENT_ID!}>
       <AuthProvider>
         {children}
       </AuthProvider>
       <Toaster position="top-right" reverseOrder={false} />
-    </GoogleOAuthProvider>
+      </GoogleOAuthProvider>
+      </>
   );
 }

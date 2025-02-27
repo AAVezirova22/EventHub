@@ -46,10 +46,10 @@ export default function Register() {
     access_token: "",
   });
   const [ profile, setProfile ] = useState<any>(null);
-  const login = useGoogleLogin({
-        onSuccess: (codeResponse : any) => setUser(codeResponse),
-        onError: (error) => console.log('Login Failed:', error)
-    });
+  // const login = useGoogleLogin({
+  //       onSuccess: (codeResponse : any) => setUser(codeResponse),
+  //       onError: (error) => console.log('Login Failed:', error)
+  //   });
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target
     setUser((prevInfo) => ({ ...prevInfo, [name]: value }))
