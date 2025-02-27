@@ -16,6 +16,7 @@ import { useRouter } from "next/navigation";
 import createEvent from "./createEvent";
 import CreateEvent from "./createEvent";
 import MyNotifications from "./myNotifications";
+import SearchBar from "./searchBar"
 
 
 const NavigationMenu = React.forwardRef<
@@ -263,12 +264,7 @@ const [isOpen, setIsOpen] = useState(false);
           </div>
           <div className="flex-row items-center flex">
           <NavigationMenuItem>
-            {/* search box */}
-          <input 
-            type="search" 
-            placeholder="Search..."
-            className="w-[30rem] text-[0.8rem] text-slate-600 font-bold ml-[25rem] px-4 py-[0.3rem] border-[0.15rem] border-gray-300 rounded-3xl focus:outline-none focus:ring-0 focus:border-gray-300 shadow"
-          />
+            <SearchBar />
           </NavigationMenuItem>
           <NavigationMenuItem>
             {/* search, make into button later */}
