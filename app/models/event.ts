@@ -9,12 +9,21 @@ const eventSchema = new mongoose.Schema(
     image: String,
     isPublic: Boolean,
     guestLimit: Number,
-    attending: Number,
+    attending: {
+      type: Number,
+      default: 0,
+    },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
-
+    // Add an array to store user IDs who have joined
+    attendees: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
     status: {
       type: String,
       enum: ["approved", "flagged", "pending"],

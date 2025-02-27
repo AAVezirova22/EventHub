@@ -12,6 +12,8 @@ export default function UserProfile() {
     const router = useRouter();
     const {data:session} = useSession();
     const [posts, setPosts] = useState<any[]>([]);
+    const [attendingEvents, setAttendingEvents] = useState<any[]>([]);
+    const userId = session?.user?.id;
     const [currentIndex, setCurrentIndex] = useState(0); 
     const [openSettings, setOpenSettings] = useState(false);
     const [email, setEmail] = useState("example@gmail.com");
@@ -36,13 +38,21 @@ export default function UserProfile() {
             if (!res.ok) throw new Error("Failed to fetch events");
             const data = await res.json();
             setPosts(data.events || []); 
+
+            const userAttendingEvents = data.events?.filter(
+              (event: any) => event.attendees?.includes(userId)
+          ) || [];
+          setAttendingEvents(userAttendingEvents);
           } catch (error) {
             console.error(error);
           }
         };
+        if (userId) {
+          fetchPosts();
+      }
       
         fetchPosts();
-      }, []);
+      }, [userId]);
     
       const filteredEvents = posts.filter((event) => {
         return event.createdByName == session?.user?.name ;
@@ -335,13 +345,19 @@ useEffect(() => {
           </div>
         </div>
 
-        {/* Attending Events */}
+        {/* **Attending Events Section** */}
         <div>
           <h3 className="text-md font-medium mb-2">Attending</h3>
-          <div className="flex items-center gap-2">
-            
+          <div className="flex flex-wrap gap-4">
+            {attendingEvents.length > 0 ? (
+              attendingEvents.map((event) => (
+                <ProfilePost key={event._id} post={event} />
+                ))
+              ) : (
+                <p className="text-gray-500">No attending events yet.</p>
+              )}
+            </div>
           </div>
-        </div>
       </section>
       </>}
         
