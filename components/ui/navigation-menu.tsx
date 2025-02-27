@@ -15,6 +15,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import createEvent from "./createEvent";
 import CreateEvent from "./createEvent";
+import MyNotifications from "./myNotifications";
 
 
 const NavigationMenu = React.forwardRef<
@@ -229,10 +230,10 @@ const [isOpen, setIsOpen] = useState(false);
     
         
         <button
-  onClick={() => setIsOpen(!isOpen)}  // Correct handler for hamburger menu
+  onClick={() => setIsOpen(!isOpen)}
   className="navbar-toggler focus:outline-none"
   aria-controls="navbarToggleExternalContent10"
-  aria-expanded={isOpen}  // Adjust to reflect the state
+  aria-expanded={isOpen}
   aria-label="Toggle navigation"
 >
   <div className="flex flex-col items-center justify-center space-y-[0.15rem]">
@@ -293,24 +294,9 @@ const [isOpen, setIsOpen] = useState(false);
               
               <div className="flex-row items-center flex space-x-4 ">
                 {/* notification button */}
-                <NavigationMenuItem className="relative">
-                  <button className="relative ml-auto flex items-center justify-center ">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-8 w-8 text-sky-800"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M15 17h5l-1.405-1.405C18.315 14.79 18 13.672 18 12.5V11a6.002 6.002 0 00-5-5.917V4a2 2 0 10-4 0v1.083A6.002 6.002 0 004 11v1.5c0 1.172-.315 2.29-.895 3.095L2 17h5m8 0a3 3 0 11-6 0m6 0H9"
-                      />
-                    </svg>
-                  </button>
-                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <MyNotifications />
+                  </NavigationMenuItem>
                 {/* avatar */}
                 <NavigationMenuItem>
                   

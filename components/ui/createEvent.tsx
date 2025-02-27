@@ -1,8 +1,8 @@
-"use client";
-
+import { toast } from "react-hot-toast";
 import * as React from "react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+
 import {
   Dialog,
   DialogContent,
@@ -102,7 +102,7 @@ export default function CreateEvent() {
 
       if (response.ok) {
         const data = await response.json();
-        alert("Event created successfully!");
+        toast.success("Event created successfully!");
         console.log("Event Created:", data);
 
         setTitle("");
