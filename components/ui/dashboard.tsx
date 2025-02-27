@@ -17,6 +17,7 @@ interface Event {
   attendees: string[];
   isPublic: boolean;
   status: string;
+  description: string;
 }
 
 export default function Dashboard() {
@@ -184,7 +185,7 @@ export default function Dashboard() {
                     href={`/events/${post._id.toString()}`}
                     className="text-blue-500 hover:underline"
                   >
-                    More info
+                  
                   </a>
                 </div>
               ))}

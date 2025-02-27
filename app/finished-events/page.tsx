@@ -11,6 +11,7 @@ interface Event {
   startDate: string;
   endDate: string;
   attendees: string[];
+  description: string;
 }
 
 export default function FinishedEvents() {
