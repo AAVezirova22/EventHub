@@ -151,21 +151,32 @@ useEffect(() => {
         {openSettings ? 
         <>
         {/* Right Side - Events Section */}
-        <section className="max-w-lg mx-auto my-8 p-6 bg-white rounded-md ">
+        <section className=" mx-auto my-8 p-6 bg-white rounded-md ">
         <h1 className="text-2xl text-gray-500 font-semibold mb-6">Edit your personal information</h1>
-      
-      {/* Full Name */}
+      <div className="flex gap-5">
+      {/* First Name */}
       <div className="mb-4 flex gap-5">
-  <label className="text-lg mt-2">Full Name</label>
+  <label className="text-lg mt-2">First Name</label>
   <div className="flex items-center space-x-2">
     <input
       type="text"
-      placeholder={session?.user?.name || "Full Name"}
+      placeholder={session?.user?.name || "First Name"}
       className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none"
     />
   </div>
 </div>
-
+ {/* Last Name */}
+ <div className="mb-4 flex gap-5">
+  <label className="text-lg mt-2">Last Name</label>
+  <div className="flex items-center space-x-2">
+    <input
+      type="text"
+      placeholder={session?.user?.name || "Last Name"}
+      className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none"
+    />
+  </div>
+</div>
+</div>
       {/* Email */}
       <div className="mb-4 flex gap-5">
         <label className="text-lg mt-2">Email</label>
@@ -208,7 +219,7 @@ useEffect(() => {
         </div>
       </div>
 
-      {/* Region Selector (Dynamic Based on Country) */}
+      
       <div className="mb-4 flex gap-5">
         <label className="text-lg mt-2">State/Province/Region</label>
         <div className="flex items-center space-x-2">
@@ -309,7 +320,7 @@ useEffect(() => {
       </>
         :  <>
         {/* Right Side - Events Section */}
-        <section className="w-3/4 p-4">
+        <section className=" mx-auto my-8 p-6 bg-white rounded-md ">
         <h2 className="text-xl text-gray-500 font-semibold mb-2">Your events</h2>
 
         {/* Created Events */}
