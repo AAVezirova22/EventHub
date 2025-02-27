@@ -47,6 +47,7 @@ export default function Post({ post }: PostProps) {
       <p className="text-slate-600 font-bold text-xl">
         {post.title.charAt(0).toUpperCase() + post.title.slice(1)} in {timeLeft} | {post.attending ?? "0"} participants
       </p>
+      <p className="text-slate-500 mt-2">{post.description}</p>
       <div className="flex items-center justify-between mt-2">
         <div className="flex items-center">
           <img
@@ -55,16 +56,16 @@ export default function Post({ post }: PostProps) {
             className="w-10 h-10 rounded-full mr-3"
           />
           <p className="text-slate-600 font-bold">{post.createdByName}</p>
+          
         </div>
-
-        {/* 👇 Button Aligned to the Right 👇 */}
+        
         <Link href={`/events/${post._id.toString()}`}>
           <button className="bg-sky-700 text-white font-semibold py-2 px-4 rounded-md hover:bg-sky-800">
             More Info
           </button>
         </Link>
       </div>
-      <p className="text-slate-500 mt-2">{post.description}</p>
+      
     </div>
   );
 }
@@ -118,7 +119,6 @@ export function ProfilePost({ post }: PostProps) {
           <p className="text-slate-600 font-bold">{post.createdByName}</p>
         </div>
 
-        {/* 👇 Button Aligned to the Right 👇 */}
         <Link href={`/events/${post._id.toString()}`}>
           <button className="bg-sky-700 text-white font-semibold py-2 px-4 rounded-md hover:bg-sky-800">
             More Info
