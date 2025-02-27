@@ -1,7 +1,9 @@
 "use client";
 import * as React from "react";
+import { useState, useEffect } from "react";
 import { DateTime } from "luxon";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 
 interface PostProps {
   post: {
@@ -16,8 +18,38 @@ interface PostProps {
   };
 }
 
+interface Comment {
+  _id: string;
+  userId: string;
+  userName: string;
+  userImage: string;
+  text: string;
+  createdAt: string;
+}
+
 export default function Post({ post }: PostProps) {
   const dt = DateTime.now();
+  const { data: session } = useSession();
+  const [showComments, setShowComments] = useState(false);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [newComment, setNewComment] = useState("");
+
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        const res = await fetch(`/api/events/${post._id}/comments`);
+        if (!res.ok) throw new Error("Failed to fetch comments");
+        const data = await res.json();
+        setComments(data.comments);
+      } catch (error) {
+        console.error("Error fetching comments:", error);
+      }
+    };
+
+    if (showComments) {
+      fetchComments();
+    }
+  }, [showComments, post._id]);
 
   function calcTimeLeft() {
     const startDateTime = DateTime.fromISO(post.startDate);
@@ -28,12 +60,35 @@ export default function Post({ post }: PostProps) {
       return `${Math.floor(diffInDays)} day${Math.floor(diffInDays) > 1 ? "s" : ""}`;
     } else if (diffInDays < 1 && diffInHours >= 1) {
       return `${Math.floor(diffInHours)} hour${Math.floor(diffInHours) > 1 ? "s" : ""}`;
-    } else if (diffInHours < 1) {
+    } else {
       return " less than 1 hour";
     }
   }
 
-  const timeLeft = calcTimeLeft();
+  const handleAddComment = async () => {
+    if (!session?.user || !newComment.trim()) return;
+
+    const userId = session.user.id;
+    const userName = session.user.name || "Anonymous";
+    const userImage = session.user.image || "https://cdn.pfps.gg/pfps/2301-default-2.png";
+
+    try {
+      const res = await fetch(`/api/events/${post._id}/comments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: newComment, userId, userName, userImage }),
+      });
+
+      if (!res.ok) throw new Error("Failed to add comment");
+
+      const data = await res.json();
+
+      setComments((prevComments) => [...prevComments, data.comment]); 
+      setNewComment("");
+    } catch (error) {
+      console.error("Error adding comment:", error);
+    }
+  };
 
   return (
     <div className="border border-gray-300 shadow-md rounded-lg p-4 mb-4">
@@ -45,9 +100,10 @@ export default function Post({ post }: PostProps) {
         />
       )}
       <p className="text-slate-600 font-bold text-xl">
-        {post.title.charAt(0).toUpperCase() + post.title.slice(1)} in {timeLeft} | {post.attending ?? "0"} participants
+        {post.title.charAt(0).toUpperCase() + post.title.slice(1)} in {calcTimeLeft()} | {post.attending ?? "0"} participants
       </p>
       <p className="text-slate-500 mt-2">{post.description}</p>
+
       <div className="flex items-center justify-between mt-2">
         <div className="flex items-center">
           <img
@@ -56,16 +112,61 @@ export default function Post({ post }: PostProps) {
             className="w-10 h-10 rounded-full mr-3"
           />
           <p className="text-slate-600 font-bold">{post.createdByName}</p>
-          
         </div>
-        
+
         <Link href={`/events/${post._id.toString()}`}>
           <button className="bg-sky-700 text-white font-semibold py-2 px-4 rounded-md hover:bg-sky-800">
             More Info
           </button>
         </Link>
       </div>
-      
+
+      <button
+        className="mt-3 text-sky-700 font-semibold hover:underline"
+        onClick={() => setShowComments(!showComments)}
+      >
+        {showComments ? "Close Comments" : "Add Comment"}
+      </button>
+
+      {showComments && (
+        <div className="mt-3 border-t border-gray-300 pt-3">
+          <div className="max-h-40 overflow-y-auto bg-gray-100 p-3 rounded-md">
+            {comments.length > 0 ? (
+              comments.map((comment) => (
+                <div key={comment._id} className="flex items-start space-x-3 border-b py-2">
+                  <img 
+                    src={comment.userImage} 
+                    alt="User" 
+                    className="w-8 h-8 rounded-full" 
+                  />
+                  <div>
+                    <p className="text-sm font-bold">{comment.userName}</p>
+                    <p className="text-slate-600 text-sm">{comment.text}</p>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-500 text-sm">No comments yet.</p>
+            )}
+          </div>
+
+          <div className="mt-2 flex items-center">
+            <input
+              type="text"
+              placeholder="Write a comment..."
+              className="border rounded-md px-3 py-1 w-full text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+            />
+            <button
+              className="ml-2 bg-sky-700 text-white px-3 py-1 rounded-md hover:bg-sky-800"
+              onClick={handleAddComment}
+            >
+              Post
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

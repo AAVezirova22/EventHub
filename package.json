@@ -23,6 +23,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "cookie-es": "^1.2.2",
+    "dotenv": "^16.4.7",
     "lucide-react": "^0.436.0",
     "luxon": "^3.5.0",
     "mongo": "^0.1.0",
