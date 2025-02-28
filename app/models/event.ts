@@ -35,6 +35,10 @@ const eventSchema = new mongoose.Schema(
       type: [commentSchema],
       default: [],
     },
+    photos: {
+      type: [String],
+      default: [],
+    },
     status: {
       type: String,
       enum: ["approved", "flagged", "pending"],

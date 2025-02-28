@@ -18,6 +18,7 @@ interface Event {
   isPublic: boolean;
   status: string;
   description: string;
+  photos?: string[];
 }
 
 export default function Dashboard() {
@@ -39,10 +40,13 @@ export default function Dashboard() {
   const [finishedEvents, setFinishedEvents] = useState<Event[]>([]);
   const [attendingIndex, setAttendingIndex] = useState(0);
   const [finishedIndex, setFinishedIndex] = useState(0);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     const fetchPosts = async () => {
-      if (!session?.user?.id) return;
+      const userId = session?.user?.id;
+      if (!userId) return;
 
       try {
         const res = await fetch("/api/eventCreation");
@@ -50,7 +54,6 @@ export default function Dashboard() {
         const data = await res.json();
 
         const now = new Date();
-        const userId = session.user.id;
 
         const attending = data.events?.filter(
           (event: Event) => event.attendees.includes(userId) && new Date(event.endDate) > now
@@ -76,6 +79,75 @@ export default function Dashboard() {
     return event.isPublic && eventEndDate > new Date() && event.status === "approved";
   });
 
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files.length > 0) {
+      setSelectedFile(event.target.files[0]);
+    }
+  };
+
+  const uploadPhoto = async (eventId: string | undefined) => {
+    if (!eventId) {
+      alert("Error: No event selected.");
+      return;
+    }
+  
+    if (!selectedFile) {
+      alert("Please select a file first.");
+      return;
+    }
+  
+    setUploading(true);
+    
+    try {
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+  
+      console.log("Uploading photo for event:", eventId);
+      console.log("Selected file:", selectedFile.name);
+  
+      const res = await fetch(`/api/events/${eventId}/photos`, {
+        method: "POST",
+        body: formData,
+      });
+  
+      if (!res.ok) {
+        const errorMessage = await res.text();
+        throw new Error(`Failed to upload photo: ${errorMessage}`);
+      }
+  
+      alert("Photo uploaded successfully!");
+      setSelectedFile(null);
+  
+      const refreshRes = await fetch("/api/eventCreation");
+  
+      if (!refreshRes.ok) {
+        const errorMessage = await refreshRes.text();
+        throw new Error(`Failed to refresh events: ${errorMessage}`);
+      }
+  
+      const refreshData = await refreshRes.json();
+      const userId = session?.user?.id;
+  
+      if (!userId) {
+        console.error("User ID not found in session");
+        return;
+      }
+  
+      setFinishedEvents(
+        refreshData.events?.filter(
+          (event: Event) =>
+            event.attendees.includes(userId) && new Date(event.endDate) < new Date()
+        ) || []
+      );
+  
+      console.log("Finished events updated:", finishedEvents);
+    } catch (error) {
+      console.error("Error uploading photo:", error);
+      alert(`Failed to upload photo: ${error}`);
+    } finally {
+      setUploading(false);
+    }
+  };
   return (
     <>
       <div className="container mx-auto p-6">
@@ -132,45 +204,66 @@ export default function Dashboard() {
               </div>
 
               {/* Finished window */}
-              <div className="w-[25rem] p-4">
-                <div className="flex gap-5 items-center">
-                  <h1 className="font-bold text-sky-800 text-3xl ml-3 mb-3">Finished</h1>
-                  <Link href="/finished-events">
-                    <button className="text-blue-500 hover:underline">Show All</button>
-                  </Link>
-                </div>
-                <div className="flex gap-3 items-center">
-                  <button
-                    className="text-2xl font-bold text-slate-300 hover:text-slate-600"
-                    onClick={() => setFinishedIndex((prev) => Math.max(0, prev - 1))}
-                    disabled={finishedIndex === 0}
-                  >
-                    &lt;
-                  </button>
+<div className="w-[25rem] p-4">
+  <div className="flex gap-5 items-center">
+    <h1 className="font-bold text-sky-800 text-3xl ml-3 mb-3">Finished</h1>
+    <Link href="/finished-events">
+      <button className="text-blue-500 hover:underline">Show All</button>
+    </Link>
+  </div>
 
-                  {finishedEvents.length > 0 ? (
-                    <div className="p-4 shadow rounded-xl border border-slate-300 py-5 w-[20rem] items-center flex flex-col">
-                      <p className="text-sky-800 text-center font-bold text-xl">You got any photos from</p>
-                      <p className="text-sky-800 text-center font-bold text-2xl mb-2">
-                        {finishedEvents[finishedIndex].title}?
-                      </p>
-                      <button className="bg-slate-200 font-bold text-center text-sm px-4 p-1 rounded text-sky-800 hover:bg-slate-700 hover:text-sky-200">
-                        Share!
-                      </button>
-                    </div>
-                  ) : (
-                    <p className="text-gray-500">No finished events</p>
-                  )}
+  <div className="flex gap-3 items-center">
+    {/* Left arrow for navigation */}
+    <button
+      className="text-2xl font-bold text-slate-300 hover:text-slate-600"
+      onClick={() => setFinishedIndex((prev) => Math.max(0, prev - 1))}
+      disabled={finishedIndex === 0}
+    >
+      &lt;
+    </button>
 
-                  <button
-                    className="text-2xl font-bold text-slate-300 hover:text-slate-600"
-                    onClick={() => setFinishedIndex((prev) => Math.min(finishedEvents.length - 1, prev + 1))}
-                    disabled={finishedIndex >= finishedEvents.length - 1}
-                  >
-                    &gt;
-                  </button>
-                </div>
-              </div>
+    {finishedEvents.length > 0 ? (
+      <div className="p-4 shadow rounded-xl border border-slate-300 py-5 w-[20rem] flex flex-col items-center">
+        <p className="text-sky-800 text-center font-bold text-xl">You got any photos from</p>
+        <p className="text-sky-800 text-center font-bold text-2xl mb-2">
+          {finishedEvents[finishedIndex].title}?
+        </p>
+
+        {/* File Input for Upload */}
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleFileChange}
+          className="mb-2 border p-2 rounded text-sky-800 cursor-pointer"
+        />
+
+        {/* Upload Button */}
+        <button
+          className={`bg-slate-200 font-bold text-center text-sm px-4 p-1 rounded text-sky-800 
+          hover:bg-slate-700 hover:text-sky-200 transition ${uploading ? "opacity-50 cursor-not-allowed" : ""}`}
+          onClick={() => uploadPhoto(finishedEvents[finishedIndex]._id)}
+          disabled={uploading}
+        >
+          {uploading ? "Uploading..." : "Share!"}
+        </button>
+
+        {/* Status Message */}
+        {uploading && <p className="text-gray-500 text-xs mt-2">Uploading photo...</p>}
+      </div>
+    ) : (
+      <p className="text-gray-500">No finished events</p>
+    )}
+
+    {/* Right arrow for navigation */}
+    <button
+      className="text-2xl font-bold text-slate-300 hover:text-slate-600"
+      onClick={() => setFinishedIndex((prev) => Math.min(finishedEvents.length - 1, prev + 1))}
+      disabled={finishedIndex >= finishedEvents.length - 1}
+    >
+      &gt;
+    </button>
+  </div>
+</div>
             </div>
 
             {/* Explore section */}
