@@ -61,7 +61,7 @@ export const authOptions: NextAuthOptions = {
       }
      
       userSession.accessToken = token;
-      console.log("userSession!!!!!!!!!!!!!!!!!!!!:", userSession);
+      // console.log("userSession!!!!!!!!!!!!!!!!!!!!:", userSession);
       return userSession;
     },
   },

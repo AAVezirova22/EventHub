@@ -52,24 +52,10 @@ export async function GET(req: NextRequest) {
     }
 
 }
-export async function GetUserById(email: string) {
-    await connect();
-    
-    try{
-        
-        const user = await User.findOne({
-            email
-        });
-        console.log("User found:", user);
-        return NextResponse.json({user});
-    } catch(error: any){
-        return NextResponse.json({ error: error.message }, { status: 500 });
-    }
 
-}
 
 export async function PATCH(req: NextRequest) {
-    console.log("Profile Picture Update API hit");
+    console.log("Profile Picture Update API hit", req.body);
     await connect();
 
     try {

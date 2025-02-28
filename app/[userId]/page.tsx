@@ -10,6 +10,8 @@ import { signOut } from "next-auth/react"
 import User from "../models/user";
 import { getToken } from "next-auth/jwt";
 import { param } from "jquery";
+import axios from "axios";
+
 
 export default function UserProfile() {
     const router = useRouter();
@@ -22,7 +24,7 @@ export default function UserProfile() {
     const userId = session?.user?.id;
     const [currentIndex, setCurrentIndex] = useState(0); 
     const [openSettings, setOpenSettings] = useState(false);
-    const [email, setEmail] = useState("example@gmail.com");
+    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("********");
     const [country, setCountry] = useState("");
     const [state, setState] = useState("");
@@ -88,9 +90,12 @@ const [fileUrl, setFileUrl] = useState<string | null>(null);
 
 useEffect(() => {
   if(session) {
+    const customSession: any = session;
+    const { picture } = customSession.accessToken;
     console.log("Client side: ", session)
     setUserSession(session);
-    setImageSrc(session?.user?.image || '');
+    setImageSrc(picture || '');
+    setFileUrl(picture || '');
   }
   
   const fetchCountries = async () => {
@@ -115,9 +120,12 @@ useEffect(() => {
   fetchCountries();
 }, [session]);
 
-// useEffect(() => {
-//   getUserById();
-// }, [fileUrl]) 
+useEffect(() => {
+  if(session?.user.email !== "") {
+    console.log("email: " , email)
+    // getUserById(); 
+  }
+}, [fileUrl]) 
 
 const [file, setFile] = useState<File | null>(null);
 
@@ -138,17 +146,21 @@ const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
   }
 };
 
+// const updateUserData = async () =>  {
+// const currentUser: any = await getUserById();
+// setFileUrl(currentUser?.image || "");
+// }
+
 const handleUpload = async () => {
   if (!fileUrl) return;
-
+  
   const formData = new FormData();
   formData.append("image", fileUrl || "");
-
+  const body = JSON.stringify({email: session?.user.email, image: fileUrl});
   try {
     const response = await fetch("/api/register", {
       method: "PATCH",
-      body: formData,
-      credentials: "include",
+      body: body,
     });
 
     if (!response.ok) {
@@ -161,6 +173,7 @@ const handleUpload = async () => {
     await fetch("/api/auth/session?update=true"); 
 
     setPreviewUrl(data.imageUrl); // Update preview
+    // updateUserData()
   } catch (error) {
     console.error("Error:", error);
   }
@@ -168,16 +181,24 @@ const handleUpload = async () => {
 // const getUserById = async () => {
   
 //   try {
-//     const url: any = "" + new URLSearchParams({ foo: 'value', bar: 2, }).toString();
-//     const response = await fetch("/api/register/GetUserById", {
-//       method: "GET",
-//       body: session?.user.email || "",
-//       credentials: "include",
-//     });
-
-//     if (!response.ok) {
-//       throw new Error("Failed to update profile picture");
+//     // const url: any = "" + new URLSearchParams({ foo: 'value', bar: 2, }).toString();
+//     // const response = await fetch("/api/currentUser", {
+//     //   method: "POST",
+//     //   body: c,
+//     //   credentials: "include",
+//     // });
+//     const body = {
+//       email: session?.user.email || ""
 //     }
+//     if(session?.user.email !== "") {
+//       const response = await axios.post("/api/currentUser", body);
+//       console.log("Response: ", response)
+      
+//       if (!response) {
+//         throw new Error("Failed to update profile picture");
+//       }
+//     }
+    
 //   } catch (error) {
 //     console.error("Error:", error);
 //   }
