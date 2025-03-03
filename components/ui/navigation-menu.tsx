@@ -161,6 +161,37 @@ const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
   const {data:session} = useSession();
   let firstName = session?.user?.name;
+
+  const [user, setUser] = useState<any>(null);
+useEffect(() => {
+  const fetchUserByEmail = async () => {
+    try {
+      const response = await fetch("/api/currentUser", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: session?.user?.email }), 
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch user");
+      }
+
+      const data = await response.json();
+      if (data.user) {
+        setUser(data.user); 
+      }
+    } catch (error) {
+      console.error("Error fetching user:", error);
+    }
+  };
+
+  if (session?.user?.email) {
+    fetchUserByEmail();
+  }
+}, [session?.user?.email]); 
+
   return(
     <>
       <NavigationMenu className="px-4 flex items-center justify-between">
@@ -297,7 +328,7 @@ const [isOpen, setIsOpen] = useState(false);
                 <NavigationMenuItem>
                   
                   <a href="/[userId]"><Avatar className="ml-8 flex items-center  justify-center">
-                    <AvatarImage src={session?.user?.image ? session.user.image : "https://cdn.pfps.gg/pfps/2301-default-2.png"}></AvatarImage>
+                    <AvatarImage src={user?.image ? user?.image : "https://cdn.pfps.gg/pfps/2301-default-2.png"}></AvatarImage>
                     <AvatarFallback>{firstName?.at(0)?.toUpperCase()}</AvatarFallback> 
                     {/* this here ^ are the initials of the person which appear when the avatar does not load */}
                   </Avatar></a>

@@ -11,6 +11,7 @@ import User from "../models/user";
 import { getToken } from "next-auth/jwt";
 import { param } from "jquery";
 import axios from "axios";
+import { NextRequest, NextResponse } from "next/server";
 
 
 export default function UserProfile() {
@@ -211,6 +212,37 @@ const toBase64 = (file:any) => new Promise((resolve, reject) => {
   reader.onload = () => resolve(reader.result);
   reader.onerror = error => reject(error);
 });
+const [user, setUser] = useState<any>(null);
+useEffect(() => {
+  const fetchUserByEmail = async () => {
+    try {
+      const response = await fetch("/api/currentUser", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: session?.user?.email }), 
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch user");
+      }
+
+      const data = await response.json();
+      if (data.user) {
+        setUser(data.user); // ✅ Store user in state
+      }
+    } catch (error) {
+      console.error("Error fetching user:", error);
+    }
+  };
+
+  if (session?.user?.email) {
+    fetchUserByEmail();
+  }
+}, [session?.user?.email]); 
+
+
 
     return(
         <>
@@ -224,7 +256,7 @@ const toBase64 = (file:any) => new Promise((resolve, reject) => {
         <div className="w-24 h-24 rounded-full mb-4">
           
             <img
-              // src={userSession?.user.image ? userSession?.user.image : "https://cdn.pfps.gg/pfps/2301-default-2.png"}
+              src={user?.image ? user?.image  : "https://cdn.pfps.gg/pfps/2301-default-2.png"}
               className="w-full h-full rounded-full object-cover"
             />
           </div>
