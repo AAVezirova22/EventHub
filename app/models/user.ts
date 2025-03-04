@@ -32,6 +32,10 @@ const userSchema = new mongoose.Schema({
     enum: ["user", "admin"],
     default: "user",
   },
+  country: {
+    type: String,
+    default: "",
+  },
 });
 
 const User = mongoose.models.User || mongoose.model("User", userSchema);

@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"; 
+import { useState } from "react"; 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from 'zod'
@@ -16,10 +16,6 @@ import {
 import { Input } from "@/components/ui/input"
 import { useRouter } from 'next/navigation'; 
 import { signIn } from "next-auth/react"
-import { GoogleLogin } from '@react-oauth/google'; 
-import { googleLogout, useGoogleLogin } from '@react-oauth/google';
-import axios from 'axios';
-
 
 const registerValidation = z.object({
   email: z.string().email(),
@@ -43,40 +39,13 @@ export default function Register() {
   const [user, setUser] = useState({
     email: "",
     password: "",
-    access_token: "",
   });
-  const [ profile, setProfile ] = useState<any>(null);
-  // const login = useGoogleLogin({
-  //       onSuccess: (codeResponse : any) => setUser(codeResponse),
-  //       onError: (error) => console.log('Login Failed:', error)
-  //   });
+
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target
     setUser((prevInfo) => ({ ...prevInfo, [name]: value }))
   };
-  useEffect(
-    () => {
-        if (user) {
-            axios
-                .get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${user.access_token}`, {
-                    headers: {
-                        Authorization: `Bearer ${user.access_token}`,
-                        Accept: 'application/json'
-                    }
-                })
-                .then((res) => {
-                    setProfile(res.data);
-                })
-                .catch((err) => console.log(err));
-        }
-    },
-    [ user ]
-);
 
-const logOut = () => {
-    googleLogout();
-    setProfile(null);
-};
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -105,37 +74,10 @@ const logOut = () => {
       setUser({
         email: "",
         password: "",
-        access_token: "",
       })
     }
   }
-  const responseMessage = async (response: any) => {
-    try {
-        const userInfo = await axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${response.access_token}`);
-        const { email, name, picture } = userInfo.data;
 
-        const checkUser = await axios.get(`/api/users?email=${email}`);
-        
-        if (!checkUser.data.exists) {
-            // Register new user
-            await axios.post("/api/register", {
-                name,
-                lastName: "", 
-                email,
-                username: email.split("@")[0], 
-                isOAuth: true,  
-            });
-        }
-
-        await signIn("google");
-    } catch (error) {
-        console.error("Google login failed:", error);
-    }
-};
-
-const errorMessage = () => {
-    console.log("An error occurred during Google login.");
-};
   return (
     <>
       <div className="flex justify-center items-center min-h-screen bg-slate-700 p-5">
@@ -208,29 +150,23 @@ const errorMessage = () => {
               </p>
             </form>
           </Form>
-          <div>
-           
-            <GoogleLogin onSuccess={responseMessage} onError={errorMessage} />
-        </div>
-        <div>
-            
-            {profile ? (
-                <div>
-                    <img src={profile.picture} alt="user image" />
-                    <h3>User Logged in</h3>
-                    <p>Name: {profile.name}</p>
-                    <p>Email Address: {profile.email}</p>
-                    <br />
-                    <br />
-                    <button onClick={logOut}>Log out</button>
-                </div>
-            ) : (
-                <button onClick={() => login()}>Sign in with Google 🚀 </button>
-            )}
-        </div>
+
+          {/* --------- SIGN IN WITH GOOGLE BUTTON --------- */}
+          <div className="mt-4">
+            <Button
+              onClick={() =>
+                signIn("google", {
+                  callbackUrl: "/", // or any route you prefer
+                  prompt: "select_account", // optional: force the Google account chooser
+                })
+              }
+              className="w-full bg-red-500 text-white"
+            >
+              Sign in with Google
+            </Button>
           </div>
-          </div>
-       
-      </>
-    );
-  }
+        </div>
+      </div>
+    </>
+  );
+}

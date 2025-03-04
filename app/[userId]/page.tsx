@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Navbar from "@/components/ui/navigation-menu";
 import { DateTime } from 'luxon';
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { ProfilePost } from "@/components/ui/post";
 import { signOut } from "next-auth/react"
 import User from "../models/user";
@@ -15,14 +15,14 @@ import { NextRequest, NextResponse } from "next/server";
 
 
 export default function UserProfile() {
-    const router = useRouter();
-    const {data:session} = useSession();
-    const [userSession, setUserSession] = useState(Object);
-    const [imageSrc, setImageSrc] = useState('');
-    // const token = getToken({req: param});
-    const [posts, setPosts] = useState<any[]>([]);
-    const [attendingEvents, setAttendingEvents] = useState<any[]>([]);
-    const userId = session?.user?.id;
+  const router = useRouter();
+  const {data:session} = useSession();
+  const [userSession, setUserSession] = useState(Object);
+  const [imageSrc, setImageSrc] = useState('');
+  // const token = getToken({req: param});
+  const [posts, setPosts] = useState<any[]>([]);
+  const [attendingEvents, setAttendingEvents] = useState<any[]>([]);
+  const userId = session?.user?.id;
     const [currentIndex, setCurrentIndex] = useState(0); 
     const [openSettings, setOpenSettings] = useState(false);
     const [email, setEmail] = useState("");
@@ -35,11 +35,14 @@ export default function UserProfile() {
       year: "1994",
     });
     const [receiveEmails, setReceiveEmails] = useState(false);
+    const [countries, setCountries] = useState([]);
+    
+    const [fileUrl, setFileUrl] = useState<string | null>(null);
 
   const handleEdit = (field : any) => {
     
   };
-
+    // fetch all events
     useEffect(() => {
         const fetchPosts = async () => {
           try {
@@ -62,10 +65,11 @@ export default function UserProfile() {
       
         fetchPosts();
       }, [userId]);
+    //filter events created by user
+    const filteredEvents = posts.filter((event) => {
+      return event.createdByName == session?.user?.name ;
+    });
     
-      const filteredEvents = posts.filter((event) => {
-        return event.createdByName == session?.user?.name ;
-      });
       const eventsPerPage = 2;
       const paginatedEvents = filteredEvents.slice(currentIndex, currentIndex + eventsPerPage);
       const nextPage = () => {
@@ -79,47 +83,89 @@ export default function UserProfile() {
             setCurrentIndex(currentIndex - eventsPerPage);
         }
     };
-
-    const [imageUrl, setImageUrl] = useState<string | null>(null);
-
-    ;
-
-  
-const [countries, setCountries] = useState([]);
-const [regions, setRegions] = useState([]);
-const [fileUrl, setFileUrl] = useState<string | null>(null);
-
-useEffect(() => {
-  if(session) {
-    const customSession: any = session;
-    const { picture } = customSession.accessToken;
-    console.log("Client side: ", session)
-    setUserSession(session);
-    setImageSrc(picture || '');
-    setFileUrl(picture || '');
-  }
-  
-  const fetchCountries = async () => {
-    try {
-      const response = await fetch("https://restcountries.com/v3.1/all");
-      const data = await response.json();
-      const countryList = data.map((country : any) => ({
-        code: country.cca2,
-        name: country.name.common,
-        region: country.region,
-        subregions: country.subregion ? [country.subregion] : [],
-      }));
-      
-      const sortedCountries = countryList.sort((a :any , b : any) => {
-        return a.name.localeCompare(b.name);
-      });
-      setCountries(sortedCountries);
-    } catch (error) {
-      console.error("Error fetching countries:", error);
+    // manage page counter and user status
+    let eventCounter = filteredEvents.length;
+    let userStatus = "";
+    if(eventCounter === 0) {
+      userStatus = "Newbie";
     }
-  };
-  fetchCountries();
-}, [session]);
+    else if(eventCounter > 0 && eventCounter < 5) {
+      userStatus = "Rising Star";
+    }
+    else if(eventCounter >= 5 && eventCounter < 10) {
+      userStatus = "Entusiast";
+    }
+    else if(eventCounter >= 10 && eventCounter < 15) {
+      userStatus = "Event Architect";
+    }
+    else if(eventCounter >= 15) {
+      userStatus = "Legend";
+    }
+    
+
+    
+    useEffect(() => {
+      if(session) {
+        const customSession: any = session;
+        const { picture } = customSession.accessToken;
+        console.log("Client side: ", session)
+        setUserSession(session);
+        setImageSrc(picture || '');
+        setFileUrl(picture || '');
+        }
+      }, [session]);
+        
+        // manage country in settings
+
+        const [selectedCountry, setSelectedCountry] = useState(null);
+        const [region, setRegion] = useState(null);
+      
+        useEffect(() => {
+          const fetchCountries = async () => {
+            try {
+              const response = await fetch("https://restcountries.com/v3.1/all");
+              const data = await response.json();
+          
+              const countryList = data.map((country: any) => ({
+                code: country.cca2,
+                name: country.name.common,
+                subregions: country.subregion ? [country.subregion] : [],
+              }));
+          
+              const sortedCountries = countryList.sort((a: any, b: any) =>
+                a.name.localeCompare(b.name)
+              );
+          
+              setCountries(sortedCountries);
+            } catch (error) {
+              console.error("Error fetching countries:", error);
+            }
+          };
+          
+          fetchCountries();
+        }, []);
+      
+        const handleCountrySelect = async (countryName: string) => {
+          try {
+            const response = await fetch(`https://restcountries.com/v3.1/name/${countryName}?fullText=true`);
+            const data = await response.json();
+          
+            // Check if country exists
+            if (data.length > 0) {
+              const selectedCountry = data[0];
+              setSelectedCountry(selectedCountry.name.common);
+              setRegion(selectedCountry.region);  // Get the region here
+            } else {
+              console.log("Country not found.");
+            }
+          } catch (error) {
+            console.error("Error fetching country data:", error);
+          }
+        };
+useEffect(() => {
+
+  handleCountrySelect(country);
+}, [country]);
 
 useEffect(() => {
   if(session?.user.email !== "") {
@@ -128,15 +174,8 @@ useEffect(() => {
   }
 }, [fileUrl]) 
 
-const [file, setFile] = useState<File | null>(null);
-
-const [previewUrl, setPreviewUrl] = useState<string | null>(session?.user?.image || null);
 const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-  // const file = event.target.files?.[0];
-  // if (file) {
-  //   setFile(file);
-  //   setPreviewUrl(URL.createObjectURL(file)); // Preview before uploading
-  // }
+
   let file = event.target.files?.[0];
   if (file) {
     toBase64(file).then((res: any) => {
@@ -147,10 +186,7 @@ const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
   }
 };
 
-// const updateUserData = async () =>  {
-// const currentUser: any = await getUserById();
-// setFileUrl(currentUser?.image || "");
-// }
+
 
 const handleUpload = async () => {
   if (!fileUrl) return;
@@ -172,38 +208,10 @@ const handleUpload = async () => {
     console.log("Profile pic updated:", data);
 
     await fetch("/api/auth/session?update=true"); 
-
-    setPreviewUrl(data.imageUrl); // Update preview
-    // updateUserData()
   } catch (error) {
     console.error("Error:", error);
   }
 };
-// const getUserById = async () => {
-  
-//   try {
-//     // const url: any = "" + new URLSearchParams({ foo: 'value', bar: 2, }).toString();
-//     // const response = await fetch("/api/currentUser", {
-//     //   method: "POST",
-//     //   body: c,
-//     //   credentials: "include",
-//     // });
-//     const body = {
-//       email: session?.user.email || ""
-//     }
-//     if(session?.user.email !== "") {
-//       const response = await axios.post("/api/currentUser", body);
-//       console.log("Response: ", response)
-      
-//       if (!response) {
-//         throw new Error("Failed to update profile picture");
-//       }
-//     }
-    
-//   } catch (error) {
-//     console.error("Error:", error);
-//   }
-// };
 
 
 const toBase64 = (file:any) => new Promise((resolve, reject) => {
@@ -253,6 +261,7 @@ useEffect(() => {
         
         <aside className="w-1/4 border-r p-4 flex flex-col items-center">
         <h2 className="text-xl text-gray-500 font-semibold mb-2">Your profile</h2>
+        <h1 className="text-xl font-semibold">{user?.status == "admin" ? "admin" : ""}</h1>
         <div className="w-24 h-24 rounded-full mb-4">
           
             <img
@@ -260,11 +269,13 @@ useEffect(() => {
               className="w-full h-full rounded-full object-cover"
             />
           </div>
-          <h2 className="text-lg font-semibold">{session?.user?.name}</h2>
-          <p className="text-gray-500 text-sm mb-4">Enthusiast</p> 
+          
+          <h1 className="text-xl font-semibold">{user?.name + " " + user?.lastName}</h1>
+          <h2 className="text-lg text-slate-700 ">@{user?.username}</h2>
+          <p className="text-gray-500 text-sm mb-4">{userStatus}</p> 
           {/* work on this pleaseee */}
 
-          <p className="text-xl font-bold">10</p>
+          <p className="text-xl font-bold">{eventCounter}</p>
           <p className="text-gray-500 text-sm mb-4">events created</p>
 
           {/* <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" id="fileInput" /> */}
@@ -281,7 +292,7 @@ useEffect(() => {
             
               <img
               
-              src={fileUrl ? fileUrl : "https://cdn.pfps.gg/pfps/2301-default-2.png"}
+              src={user?.image  ? user?.image  : "https://cdn.pfps.gg/pfps/2301-default-2.png"}
               className="w-full h-full rounded-full object-cover"
               />
             </div>
@@ -297,7 +308,7 @@ useEffect(() => {
   <div className="flex items-center space-x-2">
     <input
       type="text"
-      placeholder={session?.user?.name || "First Name"}
+      placeholder={user?.name || "First Name"}
       className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none"
     />
   </div>
@@ -308,7 +319,7 @@ useEffect(() => {
   <div className="flex items-center space-x-2">
     <input
       type="text"
-      placeholder={session?.user?.name || "Last Name"}
+      placeholder={user?.lastName || "Last Name"}
       className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none"
     />
   </div>
@@ -320,7 +331,7 @@ useEffect(() => {
         <div className="flex items-center space-x-2">
           <input
             type="email"
-            placeholder="example@gmail.com"
+            placeholder={user?.email || "Email"}
             className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none"
           />
         </div>
@@ -357,25 +368,12 @@ useEffect(() => {
       </div>
 
       
-      <div className="mb-4 flex gap-5">
-        <label className="text-lg mt-2">State/Province/Region</label>
-        <div className="flex items-center space-x-2">
-          <select
-            className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none"
-            defaultValue=""
-            disabled={regions.length === 0}
-          >
-            <option value="">
-              {regions.length > 0 ? "Select a region" : "No regions available"}
-            </option>
-            {regions.map((region, index) => (
-              <option key={index} value={region}>
-                {region}
-              </option>
-            ))}
-          </select>
+       {selectedCountry && region && (
+        <div>
+          <h3>{selectedCountry}</h3>
+          <p>Region: {region}</p>
         </div>
-      </div>
+      )}
 
       {/* Birthday */}
       <div className="mb-4 flex gap-5">
