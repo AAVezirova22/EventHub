@@ -1,7 +1,17 @@
 "use client";
 
-import { Dialog, Transition } from "@headlessui/react";
-import { Fragment, useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogPortal,
+  DialogOverlay, // Correct import for overlay
+} from "@/components/ui/dialog";
+import { useState } from "react";
+import { Button } from "../ui/button"; // Assuming you have a custom button component
 
 interface NotificationDialogProps {
   isOpen: boolean;
@@ -15,41 +25,36 @@ export default function NotificationDialog({
   notifications,
 }: NotificationDialogProps) {
   return (
-    <Transition show={isOpen} as={Fragment}>
-      <Dialog as="div" className="relative z-50" onClose={onClose}>
-        <Transition.Child
-          as={Fragment}
-        >
-          <div className="fixed inset-0 bg-black/30" />
-        </Transition.Child>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogPortal>
+        {/* Dialog overlay (background dimming) */}
+        <DialogOverlay className="  bg-black/30 flex items-center justify-center" />
 
-        <div className="fixed inset-0 flex items-center justify-center p-4">
-          <Transition.Child as={Fragment}>
-            <Dialog.Panel className="mx-auto max-w-sm rounded bg-white p-4 shadow">
-              <Dialog.Title className="font-bold text-lg">Notifications</Dialog.Title>
-              <div className="mt-4">
-                {notifications.length === 0 ? (
-                  <p className="text-gray-500">No notifications yet</p>
-                ) : (
-                  notifications.map((msg, i) => (
-                    <div key={i} className="mb-2 border-b pb-2">
-                      {msg}
-                    </div>
-                  ))
-                )}
-              </div>
-              <div className="mt-4 flex justify-end">
-                <button
-                  onClick={onClose}
-                  className="rounded bg-sky-600 px-4 py-2 text-white hover:bg-sky-700"
-                >
-                  Close
-                </button>
-              </div>
-            </Dialog.Panel>
-          </Transition.Child>
-        </div>
-      </Dialog>
-    </Transition>
+        {/* Centering dialog content */}
+        <DialogContent className=" mx-auto max-w-lg rounded-lg bg-white p-6 shadow-lg">
+          <div>
+            <DialogHeader>
+              <DialogTitle className="text-xl font-semibold text-gray-800">Notifications</DialogTitle>
+            </DialogHeader>
+            <div className="mt-4">
+              {notifications.length === 0 ? (
+                <p className="text-gray-500">No notifications yet</p>
+              ) : (
+                notifications.map((msg, i) => (
+                  <div key={i} className="mb-3 border-b pb-2 text-gray-700">
+                    {msg}
+                  </div>
+                ))
+              )}
+            </div>
+            <div className="mt-6 flex justify-end">
+              <Button onClick={onClose} variant="default" className="bg-sky-800 text-white">
+                Close
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </DialogPortal>
+    </Dialog>
   );
 }

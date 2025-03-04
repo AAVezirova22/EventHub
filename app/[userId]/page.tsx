@@ -12,6 +12,12 @@ import { getToken } from "next-auth/jwt";
 import { param } from "jquery";
 import axios from "axios";
 import { NextRequest, NextResponse } from "next/server";
+import Footer from "@/components/ui/footer";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card"
 
 
 export default function UserProfile() {
@@ -261,7 +267,7 @@ useEffect(() => {
         
         <aside className="w-1/4 border-r p-4 flex flex-col items-center">
         <h2 className="text-xl text-gray-500 font-semibold mb-2">Your profile</h2>
-        <h1 className="text-xl font-semibold">{user?.status == "admin" ? "admin" : ""}</h1>
+        <h1 className="text-xl font-semibold mb-4">{user?.role == "admin" ? "- admin -" : ""}</h1>
         <div className="w-24 h-24 rounded-full mb-4">
           
             <img
@@ -272,7 +278,27 @@ useEffect(() => {
           
           <h1 className="text-xl font-semibold">{user?.name + " " + user?.lastName}</h1>
           <h2 className="text-lg text-slate-700 ">@{user?.username}</h2>
-          <p className="text-gray-500 text-sm mb-4">{userStatus}</p> 
+          <HoverCard>
+  <HoverCardTrigger className="text-gray-500 text-sm mb-4 underline">{userStatus}</HoverCardTrigger>
+  <HoverCardContent className="bg-white text-slate-600 p-4 rounded-md shadow-lg">
+    <div>
+      <span role="img" aria-label="flower">✿</span> <strong>Newbie</strong> - Starting your journey. 0 events created. Keep pushing!
+    </div>
+    <div>
+      <span role="img" aria-label="star">✿ ✿</span> <strong>Rising Star</strong> - You’re on the rise! 1–4 events created. Let’s keep this momentum going!
+    </div>
+    <div>
+      <span role="img" aria-label="fire">✿ ✿ ✿</span> <strong>Enthusiast</strong> - You love what you do! 5–9 events created. The passion is real.
+    </div>
+    <div>
+      <span role="img" aria-label="blueprint">✿ ✿ ✿ ✿</span> <strong>Event Architect</strong> - Crafting experiences! 10–14 events created. You're shaping the scene.
+    </div>
+    <div>
+      <span role="img" aria-label="crown">✿ ✿ ✿ ✿ ✿</span> <strong>Legend</strong> - A force to be reckoned with! 15+ events created. You’re an icon in the making.
+    </div>
+  </HoverCardContent>
+</HoverCard>
+
           {/* work on this pleaseee */}
 
           <p className="text-xl font-bold">{eventCounter}</p>
@@ -488,7 +514,7 @@ useEffect(() => {
         
       </div>
     </div>
-  
+ 
         </>
     )
 

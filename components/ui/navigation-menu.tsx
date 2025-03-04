@@ -212,11 +212,7 @@ useEffect(() => {
             <>
           <li>
              {/* the add button */}
-             <button className="bg-slate-400 flex items-center justify-center rounded h-[3rem] w-[5.5rem]" >
-              <div className="text-slate-600 text-[1.2rem] font-extrabold flex items-center justify-center">
-                New
-              </div>
-            </button>
+             <CreateEvent />
           </li>
           <li className="text-slate-400">
             <div className="flex items-center cursor-pointer">
