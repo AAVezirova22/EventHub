@@ -17,6 +17,7 @@ import createEvent from "./createEvent";
 import CreateEvent from "./createEvent";
 import MyNotifications from "./myNotifications";
 import SearchBar from "./searchBar"
+import ThemeChanger from "./themeChanger";
 
 
 const NavigationMenu = React.forwardRef<
@@ -149,11 +150,9 @@ Avatar.displayName = AvatarPrimitive.Root.displayName
 
 
 export default function Navbar (){
-
-const [isOpen, setIsOpen] = useState(false);
-
+  const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
+  const [isOpen, setIsOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
-
   const toggleNavbar = () => {
    
     setIsCollapsed(!isCollapsed);
@@ -187,10 +186,11 @@ useEffect(() => {
     }
   };
 
-  if (session?.user?.email) {
-    fetchUserByEmail();
-  }
-}, [session?.user?.email]); 
+    if (session?.user?.email) {
+      fetchUserByEmail();
+    }
+  }, [session?.user?.email]); 
+ 
 
   return(
     <>
@@ -238,7 +238,8 @@ useEffect(() => {
                 <span>Link 4</span>
               </li>
               <li className="text-slate-400">
-                <span>Link 5</span>
+              
+              <ThemeChanger />
               </li>
             </ul>
           </li>
@@ -281,7 +282,7 @@ useEffect(() => {
             {/* add icon */}
             
             <a href="/">
-              <NavigationMenuLink className="font-bold text-sky-800 text-2xl ml-3">
+              <NavigationMenuLink className="font-bold text-2xl ml-3">
                 
                 EventHub
               </NavigationMenuLink>

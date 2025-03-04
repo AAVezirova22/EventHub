@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import Post from "./post";
 import Footer from "@/components/ui/footer";
 import { DateTime } from "luxon";
+import ThemeChanger from "./themeChanger";
 
 interface Event {
   _id: string;
@@ -150,8 +151,9 @@ export default function Dashboard() {
   };
   return (
     <>
+    
       <div className="container mx-auto p-6">
-        <h1 className="font-bold text-sky-800 text-4xl ml-7 mb-3">
+        <h1 className="font-bold text-4xl ml-7 mb-3">
           {hourMessage},{" "}
           <a href="/[userId]" className="text-5xl">
             {session?.user?.name}
@@ -165,7 +167,7 @@ export default function Dashboard() {
               {/* Attending window */}
               <div className="w-[25rem] p-4">
                 <div className="flex gap-5 items-center">
-                  <h1 className="font-bold text-sky-800 text-3xl ml-3 mb-3">Attending</h1>
+                  <h1 className="font-bold text-3xl ml-3 mb-3">Attending</h1>
                   <Link href="/attending">
                     <button className="text-blue-500 hover:underline">Show All</button>
                   </Link>
@@ -190,7 +192,7 @@ export default function Dashboard() {
                       </p>
                     </div>
                   ) : (
-                    <p className="text-gray-500">No upcoming events</p>
+                    <p className="text-gray-500">No upcoming events, but your story is in the making!</p>
                   )}
 
                   <button
@@ -206,7 +208,7 @@ export default function Dashboard() {
               {/* Finished window */}
 <div className="w-[25rem] p-4">
   <div className="flex gap-5 items-center">
-    <h1 className="font-bold text-sky-800 text-3xl ml-3 mb-3">Finished</h1>
+    <h1 className="font-bold  text-3xl ml-3 mb-3">Finished</h1>
     <Link href="/finished-events">
       <button className="text-blue-500 hover:underline">Show All</button>
     </Link>
@@ -234,12 +236,12 @@ export default function Dashboard() {
           type="file"
           accept="image/*"
           onChange={handleFileChange}
-          className="mb-2 border p-2 rounded text-sky-800 cursor-pointer"
+          className="mb-2 border p-2 rounded  cursor-pointer"
         />
 
         {/* Upload Button */}
         <button
-          className={`bg-slate-200 font-bold text-center text-sm px-4 p-1 rounded text-sky-800 
+          className={`bg-slate-200 font-bold text-center text-sm px-4 p-1 rounded  
           hover:bg-slate-700 hover:text-sky-200 transition ${uploading ? "opacity-50 cursor-not-allowed" : ""}`}
           onClick={() => uploadPhoto(finishedEvents[finishedIndex]._id)}
           disabled={uploading}
@@ -251,7 +253,7 @@ export default function Dashboard() {
         {uploading && <p className="text-gray-500 text-xs mt-2">Uploading photo...</p>}
       </div>
     ) : (
-      <p className="text-gray-500">No finished events</p>
+      <p className="text-gray-500">No finished events, maybe it's time to attend your first!</p>
     )}
 
     {/* Right arrow for navigation */}
@@ -268,7 +270,7 @@ export default function Dashboard() {
 
             {/* Explore section */}
             <div className="p-4">
-              <h1 className="font-bold text-sky-800 text-3xl ml-3 mb-3">
+              <h1 className="font-bold  text-3xl ml-3 mb-3">
                 Explore
               </h1>
               {filteredEvents.map((post) => (
@@ -287,7 +289,7 @@ export default function Dashboard() {
           
           {/* Hot section */}
           <div className="p-4">
-            <h1 className="font-bold text-sky-800 text-3xl ml-3 mb-3">Hot</h1>
+            <h1 className="font-bold  text-3xl ml-3 mb-3">Hot</h1>
             {filteredEvents.map((post) => (
               <Post key={post._id} post={post} />
             ))}
