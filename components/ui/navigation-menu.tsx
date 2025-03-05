@@ -13,7 +13,7 @@ import {  AvatarFallback, AvatarImage } from "@radix-ui/react-avatar"
 import { Button } from "./button";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import createEvent from "./createEvent";
+import createEvent, {  CreateButtonNav, CreateButtonSide } from "./createEvent";
 import CreateEvent from "./createEvent";
 import MyNotifications from "./myNotifications";
 import SearchBar from "./searchBar"
@@ -212,7 +212,7 @@ useEffect(() => {
             <>
           <li>
              {/* the add button */}
-             <CreateEvent />
+             <CreateButtonSide />
           </li>
           <li className="text-slate-400">
             <div className="flex items-center cursor-pointer">
@@ -313,7 +313,7 @@ useEffect(() => {
               <>
                {/* the add button */}
                 <NavigationMenuItem>
-                  <CreateEvent />
+                  <CreateButtonNav />
                 </NavigationMenuItem>
               
               <div className="flex-row items-center flex space-x-4 ">
@@ -322,9 +322,9 @@ useEffect(() => {
                   <MyNotifications />
                   </NavigationMenuItem>
                 {/* avatar */}
-                <NavigationMenuItem>
+                <NavigationMenuItem className=" flex items-center  justify-end">
                   
-                  <a href="/[userId]"><Avatar className="ml-8 flex items-center  justify-center">
+                  <a href="/[userId]"><Avatar className="ml-8 flex items-center  justify-end">
                     <AvatarImage src={user?.image ? user?.image : "https://cdn.pfps.gg/pfps/2301-default-2.png"}></AvatarImage>
                     <AvatarFallback>{firstName?.at(0)?.toUpperCase()}</AvatarFallback> 
                     {/* this here ^ are the initials of the person which appear when the avatar does not load */}

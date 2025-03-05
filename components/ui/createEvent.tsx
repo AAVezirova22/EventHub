@@ -15,6 +15,44 @@ import { useSession, signIn } from "next-auth/react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+export function CreateButtonNav(){
+  return(
+    <>
+    <Dialog>
+      <DialogTrigger asChild>
+        <button className="bg-slate-400 hover:bg-slate-600 flex items-center justify-center mr-[3rem] rounded h-8 w-[3.6rem]">
+          <div className="relative w-10 h-10 flex items-center justify-center">
+            <div className="absolute w-4 h-[0.3em] bg-white rounded"></div>
+            <div className="w-[0.3rem] h-4 absolute bg-white rounded"></div>
+          </div>
+        </button>
+      </DialogTrigger>
+      <DialogContent >
+        <CreateEvent />
+      </DialogContent>
+      </ Dialog >
+    </>
+  )
+}
+export function CreateButtonSide(){
+  return(
+    <>
+    <Dialog>
+      <DialogTrigger asChild>
+        <button className="bg-slate-400 hover:bg-slate-600 flex items-center justify-center  rounded h-9 w-[5rem]">
+          <div className="relative w-10 h-10 flex items-center justify-center">
+            <div className="absolute w-4 h-[0.3em] bg-white rounded"></div>
+            <div className="w-[0.3rem] h-4 absolute bg-white rounded"></div>
+          </div>
+        </button>
+      </DialogTrigger>
+      <DialogContent >
+        <CreateEvent />
+      </DialogContent>
+      </ Dialog >
+    </>
+  )
+}
 export default function CreateEvent() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -127,116 +165,103 @@ export default function CreateEvent() {
   }
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <button className="bg-slate-400 hover:bg-slate-600 flex items-center justify-center mr-[3rem] rounded h-8 w-[3.6rem]">
-          <div className="relative w-10 h-10 flex items-center justify-center">
-            <div className="absolute w-4 h-[0.3em] bg-white rounded"></div>
-            <div className="w-[0.3rem] h-4 absolute bg-white rounded"></div>
-          </div>
-        </button>
-      </DialogTrigger>
+    <form onSubmit={handleSubmit} className="max-w-lg mx-auto rounded-md ">
+    <div>
+      <input
+        type="text"
+        placeholder="Title"
+        className="w-full border-b pb-2 text-lg font-semibold focus:outline-none"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+      />
+      <p className="text-gray-500 text-sm mt-5">
+        This is a {isEventPublic ? "public" : "private"} event
+      </p>
+    </div>
 
-      <DialogContent className="max-w-md p-6 rounded-xl shadow-md bg-white space-y-4">
-        <form onSubmit={handleSubmit}>
-          <DialogHeader>
-            <input
-              type="text"
-              placeholder="Title"
-              className="w-full border-b pb-2 text-lg font-semibold focus:outline-none"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-            <p className="text-gray-500 text-sm mt-5">
-              This is a {isEventPublic ? "public" : "private"} event
-            </p>
-          </DialogHeader>
+    <textarea
+      placeholder="Description"
+      className="w-full h-20 border rounded-md p-2 mt-2"
+      value={description}
+      onChange={(e) => setDescription(e.target.value)}
+    />
 
-          <textarea
-            placeholder="Description"
-            className="w-full h-20 border rounded-md p-2"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
+    <input
+      type="date"
+      className="w-full border rounded-md p-2 mt-2"
+      value={startDate}
+      onChange={(e) => setStartDate(e.target.value)}
+    />
 
-          <input
-            type="date"
-            className="w-full border rounded-md p-2"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-          />
+    <input
+      type="date"
+      className="w-full border rounded-md p-2 mt-2"
+      value={endDate}
+      onChange={(e) => setEndDate(e.target.value)}
+    />
 
-          <input
-            type="date"
-            className="w-full border rounded-md p-2"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-          />
+    <input
+      type="time"
+      className="w-full border rounded-md p-2 mt-2 text-gray-700"
+      value={startTime}
+      onChange={(e) => setStartTime(e.target.value)}
+    />
 
-          <input
-            type="time"
-            className="w-full border rounded-md p-2 text-gray-700"
-            value={startTime}
-            onChange={(e) => setStartTime(e.target.value)}
-          />
+    <div className="border rounded-md p-2 cursor-pointer text-gray-500 relative mt-2">
+      <span>Add image...</span>
+      <input
+        type="file"
+        className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
+        onChange={handleImageChange}
+      />
+    </div>
 
-          <div className="border rounded-md p-2 cursor-pointer text-gray-500 relative">
-            <span>Add image...</span>
-            <input
-              type="file"
-              className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
-              onChange={handleImageChange}
-            />
-          </div>
+    <div className="flex items-center gap-2 mt-2">
+      <input
+        type="checkbox"
+        id="peopleLimit"
+        className="w-4 h-4 border rounded-md"
+        checked={isPeopleLimitChecked}
+        onChange={handleGuestChange}
+      />
+      <label htmlFor="peopleLimit" className="text-gray-700">
+        Guest limit
+      </label>
+      {isPeopleLimitChecked && (
+        <input
+          type="number"
+          className="w-16 border rounded-md p-1 text-center text-slate-700"
+          value={guestLimit}
+          onChange={(e) => setGuestLimit(Number(e.target.value))}
+        />
+      )}
+    </div>
 
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              id="peopleLimit"
-              className="w-4 h-4 border rounded-md"
-              checked={isPeopleLimitChecked}
-              onChange={handleGuestChange}
-            />
-            <Label htmlFor="peopleLimit" className="text-gray-700">
-              Guest limit
-            </Label>
-            {isPeopleLimitChecked && (
-              <input
-                type="number"
-                className="w-16 border rounded-md p-1 text-center text-slate-700"
-                value={guestLimit}
-                onChange={(e) => setGuestLimit(Number(e.target.value))}
-              />
-            )}
-          </div>
+    <div className="flex items-center gap-2 mt-2">
+      <input
+        type="checkbox"
+        id="public"
+        className="w-4 h-4 border rounded-md"
+        checked={isEventPublic}
+        onChange={handlePrivacyChange}
+      />
+      <label htmlFor="public" className="text-gray-700">
+        Public
+      </label>
+    </div>
 
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              id="public"
-              className="w-4 h-4 border rounded-md"
-              checked={isEventPublic}
-              onChange={handlePrivacyChange}
-            />
-            <Label htmlFor="public" className="text-gray-700">
-              Public
-            </Label>
-          </div>
+    <div className="flex justify-end  mt-4">
+      
+      <button
+        type="submit"
+        className="bg-black text-white rounded-md px-4 py-2"
+        disabled={loading}
+      >
+        {loading ? "Submitting..." : "Done"}
+      </button>
+    </div>
+  </form>
 
-          <DialogFooter className="flex justify-end gap-2">
-            <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
-            </DialogClose>
-            <Button
-              type="submit"
-              className="bg-black text-white rounded-md px-4 py-2"
-              disabled={loading}
-            >
-              {loading ? "Submitting..." : "Done"}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+     
   );
 }
