@@ -1,8 +1,7 @@
 import { toast } from "react-hot-toast";
 import * as React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-
 import {
   Dialog,
   DialogContent,
@@ -11,13 +10,12 @@ import {
   DialogHeader,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useSession, signIn } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export function CreateButtonNav(){
-  return(
-    <>
+export function CreateButtonNav() {
+  return (
     <Dialog>
       <DialogTrigger asChild>
         <button className="bg-slate-400 hover:bg-slate-600 flex items-center justify-center mr-[3rem] rounded h-8 w-[3.6rem]">
@@ -27,16 +25,16 @@ export function CreateButtonNav(){
           </div>
         </button>
       </DialogTrigger>
-      <DialogContent >
+      <DialogContent>
+        {/* Creating a new event by default */}
         <CreateEvent />
       </DialogContent>
-      </ Dialog >
-    </>
-  )
+    </Dialog>
+  );
 }
-export function CreateButtonSide(){
-  return(
-    <>
+
+export function CreateButtonSide() {
+  return (
     <Dialog>
       <DialogTrigger asChild>
         <button className="bg-slate-400 hover:bg-slate-600 flex items-center justify-center  rounded h-9 w-[5rem]">
@@ -46,14 +44,39 @@ export function CreateButtonSide(){
           </div>
         </button>
       </DialogTrigger>
-      <DialogContent >
+      <DialogContent>
+        {/* Creating a new event by default */}
         <CreateEvent />
       </DialogContent>
-      </ Dialog >
-    </>
-  )
+    </Dialog>
+  );
 }
-export default function CreateEvent() {
+
+// If you want to use this component for both creation and editing,
+// add optional props that let you pass the event to edit, and optionally
+// handle the updated event in the parent, or close the dialog on success.
+type EventToEdit = {
+  _id: string;
+  title?: string;
+  description?: string;
+  startDate?: string | Date;
+  endDate?: string | Date;
+  guestLimit?: number;
+  isPublic?: boolean;
+  attending?: number;
+};
+
+interface CreateEventProps {
+  eventToEdit?: EventToEdit;                // if present, we do EDIT
+  onEventUpdated?: (updatedEvent: any) => void;  // callback if parent wants updated event
+  onClose?: () => void;                          // callback if parent wants to close dialog
+}
+
+export default function CreateEvent({
+  eventToEdit,
+  onEventUpdated,
+  onClose,
+}: CreateEventProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -65,7 +88,31 @@ export default function CreateEvent() {
   const [image, setImage] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
+
+  // If we pass in `eventToEdit`, prefill form for editing
+  useEffect(() => {
+    if (eventToEdit) {
+      setTitle(eventToEdit.title || "");
+      setDescription(eventToEdit.description || "");
+
+      // Convert the startDate & endDate to YYYY-MM-DD + HH:MM
+      if (eventToEdit.startDate) {
+        const start = new Date(eventToEdit.startDate);
+        setStartDate(start.toISOString().split("T")[0]);
+        setStartTime(start.toTimeString().slice(0, 5));
+      }
+      if (eventToEdit.endDate) {
+        const end = new Date(eventToEdit.endDate);
+        setEndDate(end.toISOString().split("T")[0]);
+      }
+      if (eventToEdit.guestLimit && eventToEdit.guestLimit > 0) {
+        setIsPeopleLimitChecked(true);
+        setGuestLimit(eventToEdit.guestLimit);
+      }
+      setIsEventPublic(eventToEdit.isPublic || false);
+    }
+  }, [eventToEdit]);
 
   function handleGuestChange(e: React.ChangeEvent<HTMLInputElement>) {
     setIsPeopleLimitChecked(e.target.checked);
@@ -88,7 +135,6 @@ export default function CreateEvent() {
         alert("Image must be smaller than 2MB.");
         return;
       }
-
       setImage(file);
     }
   }
@@ -96,8 +142,9 @@ export default function CreateEvent() {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
+    // Make sure user is logged in
     if (!session?.user) {
-      alert("You must be logged in to create an event.");
+      alert("You must be logged in to create or edit an event.");
       return;
     }
 
@@ -110,6 +157,7 @@ export default function CreateEvent() {
 
     setLoading(true);
 
+    // We'll always use FormData because you're uploading an image
     const formData = new FormData();
     formData.append("title", title);
     formData.append("description", description);
@@ -120,45 +168,68 @@ export default function CreateEvent() {
       "guestLimit",
       isPeopleLimitChecked ? guestLimit.toString() : "0"
     );
-    formData.append("attending", "0");
-
-    formData.append(
-      "userId",
-      (session?.user as { id?: string })?.id?.toString() || ""
-    );
 
     if (image) {
       formData.append("image", image);
     }
 
     try {
-      const response = await fetch("/api/eventCreation", {
-        method: "POST",
-        body: formData,
-        credentials: "include",
-      });
+      let response;
 
-      if (response.ok) {
-        const data = await response.json();
-        toast.success("Event created successfully!");
-        console.log("Event Created:", data);
-
-        setTitle("");
-        setDescription("");
-        setStartDate("");
-        setStartTime("");
-        setEndDate("");
-        setIsPeopleLimitChecked(false);
-        setGuestLimit(0);
-        setIsEventPublic(false);
-        setImage(null);
+      if (eventToEdit) {
+        // Edit mode -> PUT request
+        response = await fetch(`/api/events/${eventToEdit._id}`, {
+          method: "PUT",
+          body: formData,
+          credentials: "include",
+        });
       } else {
-        const errorData = await response.json();
-        alert(`Failed to create event: ${errorData.error || "Unknown error"}`);
+        // Create mode -> POST request
+        formData.append("attending", "0");
+        formData.append(
+          "userId",
+          (session?.user as { id?: string })?.id?.toString() || ""
+        );
+        response = await fetch("/api/eventCreation", {
+          method: "POST",
+          body: formData,
+          credentials: "include",
+        });
       }
-    } catch (error) {
-      console.error("Error creating event:", error);
-      alert("Something went wrong. Please try again.");
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to save event");
+      }
+
+      const data = await response.json();
+
+      // Show success toast
+      toast.success(eventToEdit ? "Event updated successfully!" : "Event created successfully!");
+
+      // If parent wants to handle updated event in state
+      if (onEventUpdated) {
+        onEventUpdated(data.event);
+      }
+
+      // If parent wants to close the dialog automatically
+      if (onClose) {
+        onClose();
+      }
+
+      // Reset form after success
+      setTitle("");
+      setDescription("");
+      setStartDate("");
+      setStartTime("");
+      setEndDate("");
+      setIsPeopleLimitChecked(false);
+      setGuestLimit(0);
+      setIsEventPublic(false);
+      setImage(null);
+    } catch (error: any) {
+      console.error("Error creating/updating event:", error);
+      alert(`Something went wrong: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -166,102 +237,103 @@ export default function CreateEvent() {
 
   return (
     <form onSubmit={handleSubmit} className="max-w-lg mx-auto rounded-md ">
-    <div>
-      <input
-        type="text"
-        placeholder="Title"
-        className="w-full border-b pb-2 text-lg font-semibold focus:outline-none"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-      />
-      <p className="text-gray-500 text-sm mt-5">
-        This is a {isEventPublic ? "public" : "private"} event
-      </p>
-    </div>
-
-    <textarea
-      placeholder="Description"
-      className="w-full h-20 border rounded-md p-2 mt-2"
-      value={description}
-      onChange={(e) => setDescription(e.target.value)}
-    />
-
-    <input
-      type="date"
-      className="w-full border rounded-md p-2 mt-2"
-      value={startDate}
-      onChange={(e) => setStartDate(e.target.value)}
-    />
-
-    <input
-      type="date"
-      className="w-full border rounded-md p-2 mt-2"
-      value={endDate}
-      onChange={(e) => setEndDate(e.target.value)}
-    />
-
-    <input
-      type="time"
-      className="w-full border rounded-md p-2 mt-2 text-gray-700"
-      value={startTime}
-      onChange={(e) => setStartTime(e.target.value)}
-    />
-
-    <div className="border rounded-md p-2 cursor-pointer text-gray-500 relative mt-2">
-      <span>Add image...</span>
-      <input
-        type="file"
-        className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
-        onChange={handleImageChange}
-      />
-    </div>
-
-    <div className="flex items-center gap-2 mt-2">
-      <input
-        type="checkbox"
-        id="peopleLimit"
-        className="w-4 h-4 border rounded-md"
-        checked={isPeopleLimitChecked}
-        onChange={handleGuestChange}
-      />
-      <label htmlFor="peopleLimit" className="text-gray-700">
-        Guest limit
-      </label>
-      {isPeopleLimitChecked && (
+      <div>
         <input
-          type="number"
-          className="w-16 border rounded-md p-1 text-center text-slate-700"
-          value={guestLimit}
-          onChange={(e) => setGuestLimit(Number(e.target.value))}
+          type="text"
+          placeholder="Title"
+          className="w-full border-b pb-2 text-lg font-semibold focus:outline-none"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
         />
-      )}
-    </div>
+        <p className="text-gray-500 text-sm mt-5">
+          This is a {isEventPublic ? "public" : "private"} event
+        </p>
+      </div>
 
-    <div className="flex items-center gap-2 mt-2">
-      <input
-        type="checkbox"
-        id="public"
-        className="w-4 h-4 border rounded-md"
-        checked={isEventPublic}
-        onChange={handlePrivacyChange}
+      <textarea
+        placeholder="Description"
+        className="w-full h-20 border rounded-md p-2 mt-2"
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
       />
-      <label htmlFor="public" className="text-gray-700">
-        Public
-      </label>
-    </div>
 
-    <div className="flex justify-end  mt-4">
-      
-      <button
-        type="submit"
-        className="bg-black text-white rounded-md px-4 py-2"
-        disabled={loading}
-      >
-        {loading ? "Submitting..." : "Done"}
-      </button>
-    </div>
-  </form>
+      <input
+        type="date"
+        className="w-full border rounded-md p-2 mt-2"
+        value={startDate}
+        onChange={(e) => setStartDate(e.target.value)}
+      />
 
-     
+      <input
+        type="date"
+        className="w-full border rounded-md p-2 mt-2"
+        value={endDate}
+        onChange={(e) => setEndDate(e.target.value)}
+      />
+
+      <input
+        type="time"
+        className="w-full border rounded-md p-2 mt-2 text-gray-700"
+        value={startTime}
+        onChange={(e) => setStartTime(e.target.value)}
+      />
+
+      <div className="border rounded-md p-2 cursor-pointer text-gray-500 relative mt-2">
+        <span>Add image...</span>
+        <input
+          type="file"
+          className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
+          onChange={handleImageChange}
+        />
+      </div>
+
+      <div className="flex items-center gap-2 mt-2">
+        <input
+          type="checkbox"
+          id="peopleLimit"
+          className="w-4 h-4 border rounded-md"
+          checked={isPeopleLimitChecked}
+          onChange={handleGuestChange}
+        />
+        <label htmlFor="peopleLimit" className="text-gray-700">
+          Guest limit
+        </label>
+        {isPeopleLimitChecked && (
+          <input
+            type="number"
+            className="w-16 border rounded-md p-1 text-center text-slate-700"
+            value={guestLimit}
+            onChange={(e) => setGuestLimit(Number(e.target.value))}
+          />
+        )}
+      </div>
+
+      <div className="flex items-center gap-2 mt-2">
+        <input
+          type="checkbox"
+          id="public"
+          className="w-4 h-4 border rounded-md"
+          checked={isEventPublic}
+          onChange={handlePrivacyChange}
+        />
+        <label htmlFor="public" className="text-gray-700">
+          Public
+        </label>
+      </div>
+
+      <div className="flex justify-end mt-4">
+        <button
+          type="submit"
+          className="bg-black text-white rounded-md px-4 py-2"
+          disabled={loading}
+        >
+          {loading
+            ? "Submitting..."
+            : eventToEdit
+            ? "Update Event"
+            : "Done"}
+        </button>
+      </div>
+    </form>
   );
 }

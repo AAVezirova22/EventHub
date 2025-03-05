@@ -18,6 +18,7 @@ interface PostProps {
     createdByName?: string;
     attending?: number;
   };
+  hideComment?: boolean;
 }
 
 interface Comment {

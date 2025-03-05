@@ -7,6 +7,7 @@ import { DateTime } from 'luxon';
 import { use, useEffect, useState } from "react";
 import ProfilePost from "@/components/ui/post";
 import { signOut } from "next-auth/react"
+import Link from "next/link";
 import User from "../models/user";
 import { getToken } from "next-auth/jwt";
 import { param } from "jquery";
@@ -496,6 +497,12 @@ useEffect(() => {
             <button onClick={nextPage} disabled={currentIndex + eventsPerPage >= filteredEvents.length} className={`text-2xl font-bold ${currentIndex + eventsPerPage >= filteredEvents.length ? 'text-gray-400 ' : 'text-slate-500  hover:text-slate-700'}`}>&gt;</button>                       
           </div>
         </div>
+
+        <Link href={"/created-events"}>
+        <button className="text-blue-500 hover:underline mt-3">
+          Show All
+        </button>
+      </Link>
 
         {/* **Attending Events Section** */}
         <div>
