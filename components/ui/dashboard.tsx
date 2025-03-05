@@ -56,13 +56,17 @@ export default function Dashboard() {
 
         const now = new Date();
 
-        const attending = data.events?.filter(
-          (event: Event) => event.attendees.includes(userId) && new Date(event.endDate) > now
-        ) || [];
+        const attending =
+          data.events?.filter(
+            (event: Event) =>
+              event.attendees.includes(userId) && new Date(event.endDate) > now
+          ) || [];
 
-        const finished = data.events?.filter(
-          (event: Event) => event.attendees.includes(userId) && new Date(event.endDate) < now
-        ) || [];
+        const finished =
+          data.events?.filter(
+            (event: Event) =>
+              event.attendees.includes(userId) && new Date(event.endDate) < now
+          ) || [];
 
         setPosts(data.events || []);
         setAttendingEvents(attending);
@@ -77,7 +81,9 @@ export default function Dashboard() {
 
   const filteredEvents = posts.filter((event) => {
     const eventEndDate = new Date(event.endDate);
-    return event.isPublic && eventEndDate > new Date() && event.status === "approved";
+    return (
+      event.isPublic && eventEndDate > new Date() && event.status === "approved"
+    );
   });
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -91,56 +97,57 @@ export default function Dashboard() {
       alert("Error: No event selected.");
       return;
     }
-  
+
     if (!selectedFile) {
       alert("Please select a file first.");
       return;
     }
-  
+
     setUploading(true);
-    
+
     try {
       const formData = new FormData();
       formData.append("file", selectedFile);
-  
+
       console.log("Uploading photo for event:", eventId);
       console.log("Selected file:", selectedFile.name);
-  
+
       const res = await fetch(`/api/events/${eventId}/photos`, {
         method: "POST",
         body: formData,
       });
-  
+
       if (!res.ok) {
         const errorMessage = await res.text();
         throw new Error(`Failed to upload photo: ${errorMessage}`);
       }
-  
+
       alert("Photo uploaded successfully!");
       setSelectedFile(null);
-  
+
       const refreshRes = await fetch("/api/eventCreation");
-  
+
       if (!refreshRes.ok) {
         const errorMessage = await refreshRes.text();
         throw new Error(`Failed to refresh events: ${errorMessage}`);
       }
-  
+
       const refreshData = await refreshRes.json();
       const userId = session?.user?.id;
-  
+
       if (!userId) {
         console.error("User ID not found in session");
         return;
       }
-  
+
       setFinishedEvents(
         refreshData.events?.filter(
           (event: Event) =>
-            event.attendees.includes(userId) && new Date(event.endDate) < new Date()
+            event.attendees.includes(userId) &&
+            new Date(event.endDate) < new Date()
         ) || []
       );
-  
+
       console.log("Finished events updated:", finishedEvents);
     } catch (error) {
       console.error("Error uploading photo:", error);
@@ -151,7 +158,6 @@ export default function Dashboard() {
   };
   return (
     <>
-    
       <div className="container mx-auto p-6">
         <h1 className="font-bold text-4xl ml-7 mb-3">
           {hourMessage},{" "}
@@ -169,13 +175,17 @@ export default function Dashboard() {
                 <div className="flex gap-5 items-center">
                   <h1 className="font-bold text-3xl ml-3 mb-3">Attending</h1>
                   <Link href="/attending">
-                    <button className="text-blue-500 hover:underline">Show All</button>
+                    <button className="text-blue-500 hover:underline">
+                      Show All
+                    </button>
                   </Link>
                 </div>
                 <div className="flex gap-3 items-center">
                   <button
                     className="text-2xl font-bold text-slate-300 hover:text-slate-600"
-                    onClick={() => setAttendingIndex((prev) => Math.max(0, prev - 1))}
+                    onClick={() =>
+                      setAttendingIndex((prev) => Math.max(0, prev - 1))
+                    }
                     disabled={attendingIndex === 0}
                   >
                     &lt;
@@ -188,16 +198,30 @@ export default function Dashboard() {
                       </p>
                       <p className="text-sky-800 text-center font-bold">in</p>
                       <p className="text-sky-800 text-center font-bold text-2xl">
-                        {Math.ceil((new Date(attendingEvents[attendingIndex].startDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24) - 1)} Days!
+                        {Math.ceil(
+                          (new Date(
+                            attendingEvents[attendingIndex].startDate
+                          ).getTime() -
+                            Date.now()) /
+                            (1000 * 60 * 60 * 24) -
+                            1
+                        )}{" "}
+                        Days!
                       </p>
                     </div>
                   ) : (
-                    <p className="text-gray-500">No upcoming events, but your story is in the making!</p>
+                    <p className="text-gray-500">
+                      No upcoming events, but your story is in the making!
+                    </p>
                   )}
 
                   <button
                     className="text-2xl font-bold text-slate-300 hover:text-slate-600"
-                    onClick={() => setAttendingIndex((prev) => Math.min(attendingEvents.length - 1, prev + 1))}
+                    onClick={() =>
+                      setAttendingIndex((prev) =>
+                        Math.min(attendingEvents.length - 1, prev + 1)
+                      )
+                    }
                     disabled={attendingIndex >= attendingEvents.length - 1}
                   >
                     &gt;
@@ -206,93 +230,114 @@ export default function Dashboard() {
               </div>
 
               {/* Finished window */}
-<div className="w-[25rem] p-4">
-  <div className="flex gap-5 items-center">
-    <h1 className="font-bold  text-3xl ml-3 mb-3">Finished</h1>
-    <Link href="/finished-events">
-      <button className="text-blue-500 hover:underline">Show All</button>
-    </Link>
-  </div>
+              <div className="w-[25rem] p-4">
+                <div className="flex gap-5 items-center">
+                  <h1 className="font-bold  text-3xl ml-3 mb-3">Finished</h1>
+                  <Link href="/finished-events">
+                    <button className="text-blue-500 hover:underline">
+                      Show All
+                    </button>
+                  </Link>
+                </div>
 
-  <div className="flex gap-3 items-center">
-    {/* Left arrow for navigation */}
-    <button
-      className="text-2xl font-bold text-slate-300 hover:text-slate-600"
-      onClick={() => setFinishedIndex((prev) => Math.max(0, prev - 1))}
-      disabled={finishedIndex === 0}
-    >
-      &lt;
-    </button>
+                <div className="flex gap-3 items-center">
+                  {/* Left arrow for navigation */}
+                  <button
+                    className="text-2xl font-bold text-slate-300 hover:text-slate-600"
+                    onClick={() =>
+                      setFinishedIndex((prev) => Math.max(0, prev - 1))
+                    }
+                    disabled={finishedIndex === 0}
+                  >
+                    &lt;
+                  </button>
 
-    {finishedEvents.length > 0 ? (
-      <div className="p-4 shadow rounded-xl border border-slate-300 py-5 w-[20rem] flex flex-col items-center">
-        <p className="text-sky-800 text-center font-bold text-xl">You got any photos from</p>
-        <p className="text-sky-800 text-center font-bold text-2xl mb-2">
-          {finishedEvents[finishedIndex].title}?
-        </p>
+                  {finishedEvents.length > 0 ? (
+                    <div className="p-4 shadow rounded-xl border border-slate-300 py-5 w-[20rem] flex flex-col items-center">
+                      <p className="text-sky-800 text-center font-bold text-xl">
+                        You got any photos from
+                      </p>
+                      <p className="text-sky-800 text-center font-bold text-2xl mb-2">
+                        {finishedEvents[finishedIndex].title}?
+                      </p>
 
-        {/* File Input for Upload */}
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleFileChange}
-          className="mb-2 border p-2 rounded  cursor-pointer"
-        />
+                      {/* File Input for Upload */}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        className="mb-2 border p-2 rounded  cursor-pointer"
+                      />
 
-        {/* Upload Button */}
-        <button
-          className={`bg-slate-200 font-bold text-center text-sm px-4 p-1 rounded  
-          hover:bg-slate-700 hover:text-sky-200 transition ${uploading ? "opacity-50 cursor-not-allowed" : ""}`}
-          onClick={() => uploadPhoto(finishedEvents[finishedIndex]._id)}
-          disabled={uploading}
-        >
-          {uploading ? "Uploading..." : "Share!"}
-        </button>
+                      {/* Upload Button */}
+                      <button
+                        className={`bg-slate-200 font-bold text-center text-sm px-4 p-1 rounded  
+          hover:bg-slate-700 hover:text-sky-200 transition ${
+            uploading ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+                        onClick={() =>
+                          uploadPhoto(finishedEvents[finishedIndex]._id)
+                        }
+                        disabled={uploading}
+                      >
+                        {uploading ? "Uploading..." : "Share!"}
+                      </button>
 
-        {/* Status Message */}
-        {uploading && <p className="text-gray-500 text-xs mt-2">Uploading photo...</p>}
-      </div>
-    ) : (
-      <p className="text-gray-500">No finished events, maybe it's time to attend your first!</p>
-    )}
+                      {/* Status Message */}
+                      {uploading && (
+                        <p className="text-gray-500 text-xs mt-2">
+                          Uploading photo...
+                        </p>
+                      )}
+                    </div>
+                  ) : (
+                    <p className="text-gray-500">
+                      No finished events, maybe it's time to attend your first!
+                    </p>
+                  )}
 
-    {/* Right arrow for navigation */}
-    <button
-      className="text-2xl font-bold text-slate-300 hover:text-slate-600"
-      onClick={() => setFinishedIndex((prev) => Math.min(finishedEvents.length - 1, prev + 1))}
-      disabled={finishedIndex >= finishedEvents.length - 1}
-    >
-      &gt;
-    </button>
-  </div>
-</div>
+                  {/* Right arrow for navigation */}
+                  <button
+                    className="text-2xl font-bold text-slate-300 hover:text-slate-600"
+                    onClick={() =>
+                      setFinishedIndex((prev) =>
+                        Math.min(finishedEvents.length - 1, prev + 1)
+                      )
+                    }
+                    disabled={finishedIndex >= finishedEvents.length - 1}
+                  >
+                    &gt;
+                  </button>
+                </div>
+              </div>
             </div>
 
             {/* Explore section */}
             <div className="p-4">
-              <h1 className="font-bold  text-3xl ml-3 mb-3">
-                Explore
-              </h1>
+              <h1 className="font-bold  text-3xl ml-3 mb-3">Explore</h1>
               {filteredEvents.map((post) => (
                 <div key={post._id}>
                   <Post post={post} />
                   <a
                     href={`/events/${post._id.toString()}`}
                     className="text-blue-500 hover:underline"
-                  >
-                  
-                  </a>
+                  ></a>
                 </div>
               ))}
             </div>
           </div>
-          
+
           {/* Hot section */}
           <div className="p-4">
-            <h1 className="font-bold  text-3xl ml-3 mb-3">Hot</h1>
-            {filteredEvents.map((post) => (
-              <Post key={post._id} post={post} />
-            ))}
+            <h1 className="font-bold text-3xl ml-3 mb-3">Hot</h1>
+            {[...filteredEvents]
+              .sort(
+                (a, b) =>
+                  (b.attendees?.length || 0) - (a.attendees?.length || 0)
+              )
+              .map((post) => (
+                <Post key={post._id} post={post} />
+              ))}
           </div>
         </div>
         <Footer />
