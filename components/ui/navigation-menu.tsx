@@ -282,7 +282,7 @@ useEffect(() => {
             {/* add icon */}
             
             <a href="/">
-              <NavigationMenuLink className="font-bold text-2xl ml-3">
+              <NavigationMenuLink className="font-bold text-2xl ml-3 ">
                 
                 EventHub
               </NavigationMenuLink>

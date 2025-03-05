@@ -20,10 +20,10 @@ useEffect(() => {
 
     if (theme === "dark") {
         document.body.classList.add("bg-slate-900", "text-sky-200", "text-slate-400");
-        document.body.classList.remove("bg-white", "text-sky-800", "text-slate-600");
+        document.body.classList.remove("bg-white", "text-sky-800", "text-sky-800");
        
     } else {
-        document.body.classList.add("bg-white", "text-sky-800", "text-slate-600");
+        document.body.classList.add("bg-white", "text-sky-800", "text-sky-800");
         document.body.classList.remove("bg-slate-900", "text-sky-200", "text-slate-400");
         
     }

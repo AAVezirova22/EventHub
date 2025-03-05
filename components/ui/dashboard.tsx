@@ -188,7 +188,7 @@ export default function Dashboard() {
                       </p>
                       <p className="text-sky-800 text-center font-bold">in</p>
                       <p className="text-sky-800 text-center font-bold text-2xl">
-                        {Math.ceil((new Date(attendingEvents[attendingIndex].startDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))} Days!
+                        {Math.ceil((new Date(attendingEvents[attendingIndex].startDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24) - 1)} Days!
                       </p>
                     </div>
                   ) : (
