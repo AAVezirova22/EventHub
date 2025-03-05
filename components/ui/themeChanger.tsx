@@ -51,7 +51,7 @@ return (
         }}
         className={`p-2 rounded-full shadow-lg transition-colors duration-300 ${
             theme === "light"
-                ? "bg-blue-500 hover:bg-blue-600 text-white"
+                ? "bg-sky-500 hover:bg-sky-600 text-white"
                 : "bg-sky-700 hover:bg-sky-800 text-white"
         }`}
     >
