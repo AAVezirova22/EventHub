@@ -52,9 +52,6 @@ export function CreateButtonSide() {
   );
 }
 
-// If you want to use this component for both creation and editing,
-// add optional props that let you pass the event to edit, and optionally
-// handle the updated event in the parent, or close the dialog on success.
 type EventToEdit = {
   _id: string;
   title?: string;
@@ -67,9 +64,9 @@ type EventToEdit = {
 };
 
 interface CreateEventProps {
-  eventToEdit?: EventToEdit;                // if present, we do EDIT
-  onEventUpdated?: (updatedEvent: any) => void;  // callback if parent wants updated event
-  onClose?: () => void;                          // callback if parent wants to close dialog
+  eventToEdit?: EventToEdit;
+  onEventUpdated?: (updatedEvent: any) => void;
+  onClose?: () => void;
 }
 
 export default function CreateEvent({
@@ -90,13 +87,11 @@ export default function CreateEvent({
 
   const { data: session } = useSession();
 
-  // If we pass in `eventToEdit`, prefill form for editing
   useEffect(() => {
     if (eventToEdit) {
       setTitle(eventToEdit.title || "");
       setDescription(eventToEdit.description || "");
 
-      // Convert the startDate & endDate to YYYY-MM-DD + HH:MM
       if (eventToEdit.startDate) {
         const start = new Date(eventToEdit.startDate);
         setStartDate(start.toISOString().split("T")[0]);
@@ -142,7 +137,6 @@ export default function CreateEvent({
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    // Make sure user is logged in
     if (!session?.user) {
       alert("You must be logged in to create or edit an event.");
       return;
@@ -157,7 +151,6 @@ export default function CreateEvent({
 
     setLoading(true);
 
-    // We'll always use FormData because you're uploading an image
     const formData = new FormData();
     formData.append("title", title);
     formData.append("description", description);
@@ -177,14 +170,12 @@ export default function CreateEvent({
       let response;
 
       if (eventToEdit) {
-        // Edit mode -> PUT request
         response = await fetch(`/api/events/${eventToEdit._id}`, {
           method: "PUT",
           body: formData,
           credentials: "include",
         });
       } else {
-        // Create mode -> POST request
         formData.append("attending", "0");
         formData.append(
           "userId",
@@ -204,20 +195,16 @@ export default function CreateEvent({
 
       const data = await response.json();
 
-      // Show success toast
       toast.success(eventToEdit ? "Event updated successfully!" : "Event created successfully!");
 
-      // If parent wants to handle updated event in state
       if (onEventUpdated) {
         onEventUpdated(data.event);
       }
 
-      // If parent wants to close the dialog automatically
       if (onClose) {
         onClose();
       }
 
-      // Reset form after success
       setTitle("");
       setDescription("");
       setStartDate("");

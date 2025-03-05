@@ -4,11 +4,11 @@ import User from "@/app/models/user";
 import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
-
 import { Configuration, OpenAIApi } from "openai";
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
+  organization: process.env.OPENAI_ORG_ID,
 });
 const openai = new OpenAIApi(configuration);
 
@@ -47,9 +47,7 @@ export async function POST(req: NextRequest) {
     const moderationResp = await openai.createModeration({
       input: description,
     });
-    const [results] = moderationResp.data.results;
-
-    const flaggedByAI = results.flagged;
+    const flaggedByAI = moderationResp.data.results[0].flagged;
     const moderationStatus = flaggedByAI ? "flagged" : "approved";
 
     let imageUrl = "";
