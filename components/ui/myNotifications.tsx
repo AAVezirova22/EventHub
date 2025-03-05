@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import NotificationDialog from "./notificationsDialog";
-import { Bell } from "lucide-react";
+import { Bell, BellDot  } from "lucide-react";
 
 interface Notification {
   message: string;
@@ -29,15 +29,15 @@ export default function MyNotifications() {
     setNotifications(updatedNotifications);
     localStorage.setItem("notifications", JSON.stringify(updatedNotifications));
   };
-
+  const NotificationIcon = notifications.length > 0 ? BellDot : Bell;
   return (
     <>
-      <div className="relative">
+       <div className="relative">
         <button
           className="relative ml-auto flex items-center justify-center"
           onClick={handleClick}
         >
-          <Bell className="" />
+          <NotificationIcon className="h-8 w-8 text-sky-800" />
         </button>
       </div>
       <NotificationDialog
