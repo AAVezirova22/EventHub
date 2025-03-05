@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { DateTime } from "luxon";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
+import { toast } from "sonner";
+import { CalendarDays } from "lucide-react";
 
 interface PostProps {
   post: {
@@ -65,6 +67,40 @@ export default function Post({ post }: PostProps) {
     }
   }
 
+  const addNotification = (newMessage: string, icon: string) => {
+    const savedNotifications = localStorage.getItem("notifications");
+    const notifications = savedNotifications ? JSON.parse(savedNotifications) : [];
+
+    const newNotification = { message: newMessage, icon };
+
+    if (!notifications.some((notification: any) => notification.message === newMessage)) {
+      const updatedNotifications = [...notifications, newNotification];
+      localStorage.setItem("notifications", JSON.stringify(updatedNotifications));
+    }
+  };
+
+  useEffect(() => {
+    if (calcTimeLeft() === " less than 1 hour") {
+      addNotification(post.title + " by " + post.createdByName + " starting soon!", "CalendarDays");
+    }
+    if (calcTimeLeft() === "1 day") {
+      addNotification(post.title + " by " + post.createdByName + " starting tomorrow!", "CalendarDays");
+    }
+    if (calcTimeLeft() === "10 days") {
+      const notificationMessage = post.title + " by " + post.createdByName + " starting in 10 days!";
+      const savedNotifications = localStorage.getItem("notifications");
+      const notifications = savedNotifications ? JSON.parse(savedNotifications) : [];
+
+      if (!notifications.some((notification: any) => notification.message === notificationMessage)) {
+        toast(notificationMessage, {
+          description: "Plan the outfit and check the weather!",
+          icon: <CalendarDays />,
+        });
+        addNotification(notificationMessage, "CalendarDays");
+      }
+    }
+  }, []);
+
   const handleAddComment = async () => {
     if (!session?.user || !newComment.trim()) return;
 
@@ -83,7 +119,7 @@ export default function Post({ post }: PostProps) {
 
       const data = await res.json();
 
-      setComments((prevComments) => [...prevComments, data.comment]); 
+      setComments((prevComments) => [...prevComments, data.comment]);
       setNewComment("");
     } catch (error) {
       console.error("Error adding comment:", error);
@@ -134,10 +170,10 @@ export default function Post({ post }: PostProps) {
             {comments.length > 0 ? (
               comments.map((comment) => (
                 <div key={comment._id} className="flex items-start space-x-3 border-b py-2">
-                  <img 
-                    src={comment.userImage} 
-                    alt="User" 
-                    className="w-8 h-8 rounded-full" 
+                  <img
+                    src={comment.userImage}
+                    alt="User"
+                    className="w-8 h-8 rounded-full"
                   />
                   <div>
                     <p className="text-sm font-bold">{comment.userName}</p>
@@ -167,66 +203,6 @@ export default function Post({ post }: PostProps) {
           </div>
         </div>
       )}
-    </div>
-  );
-}
-
-export function ProfilePost({ post }: PostProps) {
-  const dt = DateTime.now();
-
-  function calcTimeLeft() {
-    const startDateTime = DateTime.fromISO(post.startDate);
-    const diffInDays = startDateTime.diff(dt, "days").days;
-    const diffInHours = startDateTime.diff(dt, "hours").hours;
-    const diffInMins = startDateTime.diff(dt, "minutes").minutes;
-
-    if (diffInDays >= 1) {
-      return ` in ${Math.floor(diffInDays)} day${Math.floor(diffInDays) > 1 ? "s" : ""}`;
-    } else if (diffInDays < 1 && diffInHours >= 1) {
-      return ` in ${Math.floor(diffInHours)} hour${Math.floor(diffInHours) > 1 ? "s" : ""}`;
-    } else if (diffInHours < 1 && diffInMins > 0) {
-      return ` in ${Math.floor(diffInMins)} minute${Math.floor(diffInMins) > 1 ? "s" : ""}`;
-    } else {
-      if (Math.abs(diffInDays) >= 1) {
-        return `${Math.abs(Math.floor(diffInDays))} day${Math.abs(Math.floor(diffInDays)) > 1 ? "s" : ""} ago`;
-      } else if (Math.abs(diffInHours) >= 1) {
-        return `${Math.abs(Math.floor(diffInHours))} hour${Math.abs(Math.floor(diffInHours)) > 1 ? "s" : ""} ago`;
-      } else {
-        return `${Math.abs(Math.floor(diffInMins))} minute${Math.abs(Math.floor(diffInMins)) > 1 ? "s" : ""} ago`;
-      }
-    }
-  }
-
-  const timeLeft = calcTimeLeft();
-
-  return (
-    <div className="border border-gray-300 shadow-md rounded-lg p-4 mb-4">
-      {post.image && (
-        <img
-          src={post.image}
-          alt={post.title}
-          className="w-full h-48 object-cover rounded-lg mb-2"
-        />
-      )}
-      <p className="text-slate-600 font-bold text-lg">
-        {post.title.charAt(0).toUpperCase() + post.title.slice(1)} {timeLeft} | {post.attending ?? "0"} participants
-      </p>
-      <div className="flex items-center justify-between mt-2">
-        <div className="flex items-center">
-          <img
-            src={post.createdByImage || "https://cdn.pfps.gg/pfps/2301-default-2.png"}
-            className="w-10 h-10 rounded-full mr-3"
-          />
-          <p className="text-slate-600 font-bold">{post.createdByName}</p>
-        </div>
-
-        <Link href={`/events/${post._id.toString()}`}>
-          <button className="bg-sky-700 text-white font-semibold py-2 px-4 rounded-md hover:bg-sky-800">
-            More Info
-          </button>
-        </Link>
-      </div>
-      <p className="text-slate-500 mt-2">{post.description}</p>
     </div>
   );
 }

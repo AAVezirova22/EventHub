@@ -5,6 +5,9 @@ import "./globals.css";
 
 // Import the client wrapper that we'll create below
 import ClientWrapper from "./client-wrapper";
+import { Toaster } from "@/components/ui/sonner"
+
+
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,6 +27,7 @@ export default function RootLayout({
         <ClientWrapper>
           {children}
         </ClientWrapper>
+        <Toaster />
       </body>
     </html>
   );

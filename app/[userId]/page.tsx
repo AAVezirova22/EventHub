@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import Navbar from "@/components/ui/navigation-menu";
 import { DateTime } from 'luxon';
 import { use, useEffect, useState } from "react";
-import { ProfilePost } from "@/components/ui/post";
+import ProfilePost from "@/components/ui/post";
 import { signOut } from "next-auth/react"
 import User from "../models/user";
 import { getToken } from "next-auth/jwt";
@@ -18,6 +18,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card"
+import toast from "react-hot-toast";
 
 
 export default function UserProfile() {
@@ -212,7 +213,7 @@ const handleUpload = async () => {
 
     const data = await response.json();
     console.log("Profile pic updated:", data);
-
+    toast("Profile picture updated!");
     await fetch("/api/auth/session?update=true"); 
   } catch (error) {
     console.error("Error:", error);
