@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import Navbar from "@/components/ui/navigation-menu";
-import { ProfilePost } from "@/components/ui/post";
+import ProfilePost from "@/components/ui/post";
 
 interface Event {
   _id: string;

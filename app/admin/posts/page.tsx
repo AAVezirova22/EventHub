@@ -12,7 +12,7 @@ export default function AdminPostsPage() {
 
   useEffect(() => {
     const userRole = (session?.user as { role?: string })?.role;
-    
+
     if (userRole && userRole !== "admin") {
       router.replace("/");
     }
@@ -33,7 +33,12 @@ export default function AdminPostsPage() {
     fetchFlaggedPosts();
   }, []);
 
-  if (loading) return <div>Loading flagged posts...</div>;
+  if (loading)
+    return (
+      <div className="flex justify-center items-center h-screen text-gray-500 text-lg">
+        Loading flagged posts...
+      </div>
+    );
 
   const handleApprove = async (postId: string) => {
     try {
@@ -60,19 +65,40 @@ export default function AdminPostsPage() {
   };
 
   return (
-    <div>
-      <h1>Admin - Flagged or Pending Posts</h1>
+    <div className="max-w-4xl mx-auto p-6">
+      <h1 className="text-2xl font-bold text-slate-800 text-center mb-6">
+        Admin - Flagged Posts
+      </h1>
+
       {posts.length === 0 ? (
-        <p>No flagged posts to review.</p>
+        <p className="text-center text-gray-500">No flagged posts to review.</p>
       ) : (
-        posts.map((post) => (
-          <div key={post._id} style={{ border: "1px solid #ccc", margin: "10px 0" }}>
-            <h2>{post.title}</h2>
-            <p>{post.content}</p>
-            <button onClick={() => handleApprove(post._id)}>Approve</button><br /> 
-            <button onClick={() => handleReject(post._id)}>Reject</button>
-          </div>
-        ))
+        <div className="space-y-6">
+          {posts.map((post) => (
+            <div
+              key={post._id}
+              className="bg-white shadow-md rounded-lg p-6 border border-gray-200"
+            >
+              <h2 className="text-lg font-semibold text-gray-800">{post.title}</h2>
+              <p className="text-gray-600 mt-2">{post.content}</p>
+
+              <div className="flex justify-end space-x-4 mt-4">
+                <button
+                  onClick={() => handleApprove(post._id)}
+                  className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md transition"
+                >
+                  Approve
+                </button>
+                <button
+                  onClick={() => handleReject(post._id)}
+                  className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition"
+                >
+                  Reject
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );

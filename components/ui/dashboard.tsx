@@ -266,7 +266,7 @@ export default function Dashboard() {
                         type="file"
                         accept="image/*"
                         onChange={handleFileChange}
-                        className="mb-2 border p-2 rounded  cursor-pointer"
+                        className="pl-5 font-bold text-center text-sm px-1 py-1 rounded transition cursor-pointer inline-block"
                       />
 
                       {/* Upload Button */}
