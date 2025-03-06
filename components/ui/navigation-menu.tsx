@@ -16,11 +16,11 @@ import { CreateButtonNav, CreateButtonSide } from "./createEvent";
 import MyNotifications from "./myNotifications";
 import SearchBar from "./searchBar"
 import ThemeChanger from "./themeChanger";
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card"
+import { useTranslation } from "react-i18next";
+import { changeLanguage } from "i18next";
+import LanguageChanger from "./languageChanger";
+
+
 
 const NavigationMenu = React.forwardRef<
   React.ElementRef<typeof NavigationMenuPrimitive.Root>,
@@ -148,6 +148,7 @@ const Avatar = React.forwardRef<
 Avatar.displayName = AvatarPrimitive.Root.displayName
 
 export default function Navbar() {
+ const { t } = useTranslation();
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
   const [isOpen, setIsOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -242,12 +243,12 @@ export default function Navbar() {
                               href="/[userId]"
                               className="text-sky-700 hover:underline text-sm"
                             >
-                              View Profile
+                              {t("viewprofile")}
                             </a>
                           </div>
                         </li>
                         <li className="text-gray-600 font-bold w-full text-center">
-                          Is your birthday soon? <br /> Create an event!
+                        {t("text1side")} <br /> {t("text2side")}
                         </li>
                         <li>
                           <CreateButtonSide />
@@ -256,6 +257,9 @@ export default function Navbar() {
                         
                         <li className="text-gray-600 w-full text-center pt-8">
                           <ThemeChanger />
+                        </li>
+                        <li>
+                          <LanguageChanger />
                         </li>
                       </>
                     ) : (

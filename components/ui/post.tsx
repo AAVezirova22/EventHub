@@ -6,7 +6,8 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { CalendarDays } from "lucide-react";
-
+import ThemeChanger from "./themeChanger";
+import { useTranslation } from "react-i18next";
 interface PostProps {
   post: {
     _id: string;
@@ -31,6 +32,7 @@ interface Comment {
 }
 
 export default function Post({ post }: PostProps) {
+  const { t  } = useTranslation();
   const dt = DateTime.now();
   const { data: session } = useSession();
   const [showComments, setShowComments] = useState(false);
@@ -60,11 +62,11 @@ export default function Post({ post }: PostProps) {
     const diffInHours = startDateTime.diff(dt, "hours").hours;
 
     if (diffInDays >= 1) {
-      return `${Math.floor(diffInDays)} day${Math.floor(diffInDays) > 1 ? "s" : ""}`;
+      return `${Math.floor(diffInDays)} ${Math.floor(diffInDays) > 1 ? t("dayss") : t("day")}`;
     } else if (diffInDays < 1 && diffInHours >= 1) {
       return `${Math.floor(diffInHours)} hour${Math.floor(diffInHours) > 1 ? "s" : ""}`;
     } else {
-      return " less than 1 hour";
+      return t("less1hour");
     }
   }
 
@@ -137,7 +139,7 @@ export default function Post({ post }: PostProps) {
         />
       )}
       <p className="text-slate-600 font-bold text-xl">
-        {post.title.charAt(0).toUpperCase() + post.title.slice(1)} in {calcTimeLeft()} | {post.attending ?? "0"} participants
+        {post.title.charAt(0).toUpperCase() + post.title.slice(1)} {t("in")} {calcTimeLeft()} | {post.attending ?? "0"} {t("participants")}
       </p>
       <p className="text-slate-500 mt-2">{post.description}</p>
 
@@ -153,7 +155,7 @@ export default function Post({ post }: PostProps) {
 
         <Link href={`/events/${post._id.toString()}`}>
           <button className="bg-sky-700 text-white font-semibold py-2 px-4 rounded-md hover:bg-sky-800">
-            More Info
+          {t("moreinfo")}
           </button>
         </Link>
       </div>
@@ -162,7 +164,7 @@ export default function Post({ post }: PostProps) {
         className="mt-3 text-sky-700 font-semibold hover:underline"
         onClick={() => setShowComments(!showComments)}
       >
-        {showComments ? "Close Comments" : "Add Comment"}
+        {showComments ? t("closecomment") : t("writecomment")}
       </button>
 
       {showComments && (
@@ -183,14 +185,14 @@ export default function Post({ post }: PostProps) {
                 </div>
               ))
             ) : (
-              <p className="text-gray-500 text-sm">No comments yet.</p>
+              <p className="text-gray-500 text-sm">{t("nocomment")}</p>
             )}
           </div>
 
           <div className="mt-2 flex items-center">
             <input
               type="text"
-              placeholder="Write a comment..."
+              placeholder={t("writecomment")}
               className="border rounded-md px-3 py-1 w-full text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
@@ -199,7 +201,7 @@ export default function Post({ post }: PostProps) {
               className="ml-2 bg-sky-700 text-white px-3 py-1 rounded-md hover:bg-sky-800"
               onClick={handleAddComment}
             >
-              Post
+              {t("post")}
             </button>
           </div>
         </div>

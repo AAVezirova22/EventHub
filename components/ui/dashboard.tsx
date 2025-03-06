@@ -9,6 +9,7 @@ import Post from "./post";
 import Footer from "@/components/ui/footer";
 import { DateTime } from "luxon";
 import ThemeChanger from "./themeChanger";
+import { useTranslation } from "react-i18next";
 
 interface Event {
   _id: string;
@@ -23,17 +24,18 @@ interface Event {
 }
 
 export default function Dashboard() {
+  const { t  } = useTranslation();
   const router = useRouter();
   const { data: session } = useSession();
   const dt = DateTime.now();
   let hourMessage;
 
   if (dt.hour >= 4 && dt.hour < 12) {
-    hourMessage = "Good morning";
+    hourMessage = t("goodmorning");
   } else if (dt.hour >= 12 && dt.hour < 18) {
-    hourMessage = "Good afternoon";
+    hourMessage = t("goodaf");
   } else {
-    hourMessage = "Good evening";
+    hourMessage = t("goodev");
   }
 
   const [posts, setPosts] = useState<Event[]>([]);
@@ -43,6 +45,7 @@ export default function Dashboard() {
   const [finishedIndex, setFinishedIndex] = useState(0);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -159,6 +162,7 @@ export default function Dashboard() {
   return (
     <>
       <div className="container mx-auto p-6">
+      
         <h1 className="font-bold text-4xl ml-7 mb-3">
           {hourMessage},{" "}
           <a href="/[userId]" className="text-5xl">
@@ -173,10 +177,10 @@ export default function Dashboard() {
               {/* Attending window */}
               <div className="w-[25rem] p-4">
                 <div className="flex gap-5 items-center">
-                  <h1 className="font-bold text-3xl ml-3 mb-3">Attending</h1>
+                  <h1 className="font-bold text-3xl ml-3 mb-3">{t("attending")}</h1>
                   <Link href="/attending">
                     <button className="text-blue-500 hover:underline">
-                      Show All
+                    {t("showall")}
                     </button>
                   </Link>
                 </div>
@@ -196,7 +200,7 @@ export default function Dashboard() {
                       <p className="text-sky-800 text-center font-bold text-2xl">
                         {attendingEvents[attendingIndex].title}
                       </p>
-                      <p className="text-sky-800 text-center font-bold">in</p>
+                      <p className="text-sky-800 text-center font-bold">{t("in")}</p>
                       <p className="text-sky-800 text-center font-bold text-2xl">
                         {Math.ceil(
                           (new Date(
@@ -206,12 +210,12 @@ export default function Dashboard() {
                             (1000 * 60 * 60 * 24) -
                             1
                         )}{" "}
-                        Days!
+                        {t("days")}
                       </p>
                     </div>
                   ) : (
                     <p className="text-gray-500">
-                      No upcoming events, but your story is in the making!
+                      {t("nojoined")}
                     </p>
                   )}
 
@@ -232,10 +236,10 @@ export default function Dashboard() {
               {/* Finished window */}
               <div className="w-[25rem] p-4">
                 <div className="flex gap-5 items-center">
-                  <h1 className="font-bold  text-3xl ml-3 mb-3">Finished</h1>
+                  <h1 className="font-bold  text-3xl ml-3 mb-3">{t("finished")}</h1>
                   <Link href="/finished-events">
                     <button className="text-blue-500 hover:underline">
-                      Show All
+                    {t("showall")}
                     </button>
                   </Link>
                 </div>
@@ -255,7 +259,7 @@ export default function Dashboard() {
                   {finishedEvents.length > 0 ? (
                     <div className="p-4 shadow rounded-xl border border-slate-300 py-5 w-[20rem] flex flex-col items-center">
                       <p className="text-sky-800 text-center font-bold text-xl">
-                        You got any photos from
+                      {t("photosq")} 
                       </p>
                       <p className="text-sky-800 text-center font-bold text-2xl mb-2">
                         {finishedEvents[finishedIndex].title}?
@@ -286,13 +290,13 @@ export default function Dashboard() {
                       {/* Status Message */}
                       {uploading && (
                         <p className="text-gray-500 text-xs mt-2">
-                          Uploading photo...
+                          {t("upload")}
                         </p>
                       )}
                     </div>
                   ) : (
                     <p className="text-gray-500">
-                      No finished events, maybe it's time to attend your first!
+                      {t("nofinished")}
                     </p>
                   )}
 
@@ -314,7 +318,7 @@ export default function Dashboard() {
 
             {/* Explore section */}
             <div className="p-4">
-              <h1 className="font-bold  text-3xl ml-3 mb-3">Explore</h1>
+              <h1 className="font-bold  text-3xl ml-3 mb-3">{t("explore")}</h1>
               {filteredEvents.map((post) => (
                 <div key={post._id}>
                   <Post post={post} />
@@ -329,7 +333,7 @@ export default function Dashboard() {
 
           {/* Hot section */}
           <div className="p-4">
-            <h1 className="font-bold text-3xl ml-3 mb-3">Hot</h1>
+            <h1 className="font-bold text-3xl ml-3 mb-3">{t("hot")}</h1>
             {[...filteredEvents]
               .sort(
                 (a, b) =>

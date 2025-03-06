@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "../ui/button";
 import { Trash, CalendarDays, CalendarHeart } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface Notification {
   message: string;
@@ -28,6 +29,7 @@ export default function NotificationDialog({
   notifications,
   onDelete,
 }: NotificationDialogProps) {
+  const { t  } = useTranslation();
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogPortal>
@@ -35,12 +37,12 @@ export default function NotificationDialog({
         <DialogContent className="mx-auto max-w-lg rounded-lg bg-white p-6 shadow-lg">
           <DialogHeader>
             <DialogTitle className="text-xl font-semibold text-gray-800">
-              Notifications
+            {t("notif")}
             </DialogTitle>
           </DialogHeader>
           <div className="mt-4">
             {notifications.length === 0 ? (
-              <p className="text-gray-500">No notifications yet</p>
+              <p className="text-gray-500">{t("nonotif")}</p>
             ) : (
               notifications.map((notification, i) => (
                 <div key={i} className="mb-3 border-b pb-2 flex items-center justify-between text-gray-700">

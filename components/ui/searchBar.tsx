@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface Event {
   _id: string;
@@ -57,13 +58,13 @@ export default function EventSearch() {
       );
     }
   }, [searchQuery, events]);
-
+  const { t  } = useTranslation();
   return (
     <div className="relative">
       {/* Search Box */}
       <input
         type="search"
-        placeholder="Search events..."
+        placeholder={t("searchevent")}
         className="w-[30rem] text-[0.9rem] text-slate-600 font-semibold ml-[25rem] px-4 py-2 border border-gray-300 rounded-3xl focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow"
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
