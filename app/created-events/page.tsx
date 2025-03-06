@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import Post from "@/components/ui/post";
 import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
 import CreateEvent from "@/components/ui/createEvent";
-import { toast } from "react-hot-toast"; 
+import { toast } from "sonner"; 
 
 type EventData = {
   _id: string;
@@ -61,10 +61,10 @@ export default function CreatedEventsPage() {
       }
 
       setEvents((prev) => prev.filter((evt) => evt._id !== eventId));
-      toast.success("Event deleted successfully!");
+      toast("Event deleted successfully!");
     } catch (error) {
       console.error("Error deleting event:", error);
-      toast.error("Failed to delete event");
+      toast("Failed to delete event");
     }
   };
 
@@ -73,7 +73,7 @@ export default function CreatedEventsPage() {
       prev.map((evt) => (evt._id === updatedEvent._id ? updatedEvent : evt))
     );
     setOpenDialog(false);
-    toast.success("Event updated successfully!");
+    toast("Event updated successfully!");
   };
 
   if (!session?.user) {

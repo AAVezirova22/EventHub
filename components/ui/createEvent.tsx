@@ -1,4 +1,4 @@
-import { toast } from "react-hot-toast";
+import { toast } from "sonner";
 import * as React from "react";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -195,7 +195,7 @@ export default function CreateEvent({
 
       const data = await response.json();
 
-      toast.success(eventToEdit ? "Event updated successfully!" : "Event created successfully!");
+      toast(eventToEdit ? "Event updated successfully!" : "Event created successfully!");
 
       if (onEventUpdated) {
         onEventUpdated(data.event);
