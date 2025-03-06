@@ -1,66 +1,76 @@
-import User from "@/app/models/auth";
-import NextAuth, { NextAuthOptions } from "next-auth"
-import CredentialProvider from "next-auth/providers/credentials"
+import NextAuth, { NextAuthOptions } from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
+import bcryptjs from "bcryptjs";
 import { connect } from "@/app/config/dbConfig";
-import bcryptjs from "bcryptjs"
-import { NextRequest, NextResponse } from "next/server";
-
-
-
+import UserModel from "@/app/models/user";
+import User from "@/app/models/user";
 
 export const authOptions: NextAuthOptions = {
   providers: [
-    CredentialProvider({
-        name: "credentials",
-        credentials:{},
-        async authorize(credentials) {
-            const {email, password} = credentials as {
-                email: string;
-                password: string
-            }
-            try{
-                await connect();
-                const user = await User.findOne({email});
-                if(!user){
-                    return null;
-                }
-                
-                const passwordsMatch = await bcryptjs.compare(password, user.password)
-                if(!passwordsMatch) {return null}
-                return user;
-            }catch(error){
-                console.log("Error:", error);
-            }
-        },
-    })
+    CredentialsProvider({
+      name: "Credentials",
+      credentials: {
+        email: { label: "Email", type: "text" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials) {
+        if (!credentials) return null;
+        const { email, password } = credentials;
+
+        await connect();
+        const dbUser = await User.findOne({ email });
+        if (!dbUser) throw new Error("User not found");
+
+        const valid = await bcryptjs.compare(password, dbUser.password);
+        if (!valid) throw new Error("Incorrect password");
+
+        return {
+          id: dbUser._id.toString(),
+          email: dbUser.email || null,
+          name: dbUser.name || null,
+          image: dbUser.image ?? null,
+          lastName: dbUser.lastName ?? null,
+        };
+      },
+    }),
   ],
-  session:{
-    strategy:"jwt"
+  session: {
+    strategy: "jwt",
   },
-  callbacks:{
-    async jwt({token, user}){
-        if(user){
-            token.email = user.email;
-            token.name = user.name;
-
-
-        }
-        return token;
+  callbacks: {
+   
+    async jwt({ token, user }) {
+      if (user) {
+        const dbUser = await User.findOne({ email: user.email });
+        token.id = user.id;
+        token.email = user.email ?? undefined;
+        token.name = user.name ?? undefined;
+        token.picture = user.image ?? undefined;
+        token.lastName = dbUser.lastName ?? undefined;
+      }
+      return token;
     },
-    async session({session, token}:{session:any, token:any}){
-        if(session.user){
-            session.user.email = token.email;
-            session.user.name = token.name
-        }
-        console.log(session)
-        return session
-    }
+    async session({ session, token }) {
+      const userSession: any = session;
+      if (userSession.user) {
+        const dbUser = await User.findOne({ email: userSession?.user?.email });
+        userSession.user.id = token.id || "";
+        userSession.user.email = token.email || null;
+        userSession.user.name = token.name || null;
+        userSession.user.image = token.picture || null;
+      }
+     
+      userSession.accessToken = token;
+      // console.log("userSession!!!!!!!!!!!!!!!!!!!!:", userSession);
+      return userSession;
+    },
   },
-  secret: process.env.NEXTAUTH_URL!,
-  pages:{
+  secret: process.env.NEXTAUTH_SECRET,
+  pages: {
     signIn: "/login",
-  }
-}
+  },
+};
 
-const handler = NextAuth(authOptions)
-export {handler as GET, handler as POST}
+const handler = NextAuth(authOptions);
+
+export { handler as GET, handler as POST };
