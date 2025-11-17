@@ -37,7 +37,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
 
     event.comments.push(newComment);
     await event.save();
-
+    
     return NextResponse.json({ message: "✅ Comment added successfully", comment: newComment }, { status: 200 });
   } catch (error) {
     console.error("❌ Error adding comment:", error);

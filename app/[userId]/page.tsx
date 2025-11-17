@@ -246,7 +246,7 @@ useEffect(() => {
 
       const data = await response.json();
       if (data.user) {
-        setUser(data.user); // ✅ Store user in state
+        setUser(data.user); 
       }
     } catch (error) {
       console.error("Error fetching user:", error);
