@@ -310,7 +310,9 @@ useEffect(() => {
           <button onClick={() => setOpenSettings(!openSettings)} className="bg-indigo-700 text-white px-4 py-2 rounded-3xl cursor-pointer">{openSettings ? "Done" :  "Edit profile"}</button>
           <a href="/signup"><button onClick={() => signOut()} className="mt-2 text-gray-500 border px-4 py-2 rounded-3xl">Sign out</button></a>
         </aside>
+         {/* IF settings are open */}
         {openSettings ? 
+       
         <>
         {/* Right Side - Events Section */}
         <section className=" mx-auto my-8 p-6 bg-white rounded-md ">
@@ -320,13 +322,13 @@ useEffect(() => {
             
               <img
               
-              src={user?.image  ? user?.image  : "https://cdn.pfps.gg/pfps/2301-default-2.png"}
+              src={fileUrl ? fileUrl  : user?.image}
               className="w-full h-full rounded-full object-cover"
               />
             </div>
 
              <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" id="fileInput" /> 
-            <button onClick={() => document.getElementById('fileInput')?.click()} className="bg-indigo-700 h-10 text-white px-4 py-2 rounded-3xl cursor-pointer">{session?.user?.image ? "Edit profile pic" :  "Add profile pic"}</button>
+            <button onClick={() => document.getElementById('fileInput')?.click()} className="bg-indigo-700 h-10 text-white px-4 py-2 rounded-3xl cursor-pointer">{user?.image ? "Edit profile pic" :  "Add profile pic"}</button>
         </div>
       <div className="flex gap-5">
         

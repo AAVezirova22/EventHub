@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { CalendarDays } from "lucide-react";
+import Navbar from "@/components/ui/navigation-menu";
+
 
 interface Event {
   _id: string;
@@ -133,7 +135,11 @@ export default function EventDetails() {
 
   const eventDate = event.startDate ? new Date(event.startDate) : null;
   return (
+    <>
+   <Navbar />
+   
     <div className="min-h-screen bg-gray-200 flex justify-center items-center p-8">
+      
       <div className="bg-white shadow-lg rounded-xl w-full max-w-4xl p-8">
         <h1 className="font-bold text-3xl mb-4">{event.title}</h1>
         <p className="text-gray-700 mb-2">
@@ -166,5 +172,6 @@ export default function EventDetails() {
         </Button>
       </div>
     </div>
+     </>
   );
 }
