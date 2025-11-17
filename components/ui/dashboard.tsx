@@ -10,6 +10,7 @@ import Footer from "@/components/ui/footer";
 import { DateTime } from "luxon";
 import ThemeChanger from "./themeChanger";
 import { useTranslation } from "react-i18next";
+import toast from "react-hot-toast";
 
 interface Event {
   _id: string;
@@ -102,7 +103,7 @@ export default function Dashboard() {
     }
 
     if (!selectedFile) {
-      alert("Please select a file first.");
+      toast("Please select a file first.");
       return;
     }
 

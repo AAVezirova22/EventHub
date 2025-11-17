@@ -16,6 +16,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { useRouter } from 'next/navigation'; 
 import { signIn } from "next-auth/react"
+import toast from "react-hot-toast";
 
 const registerValidation = z.object({
   email: z.string().email(),
@@ -51,7 +52,7 @@ export default function Register() {
     setLoading(true)
     try {
       if (!user.email || !user.password) {
-        setError("Please, fill all the fields!")
+        toast("Please, fill all the fields!")
         return
       }
       const res = await signIn("credentials", {

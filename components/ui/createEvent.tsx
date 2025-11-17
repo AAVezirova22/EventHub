@@ -82,8 +82,9 @@ export default function CreateEvent({
   const [isPeopleLimitChecked, setIsPeopleLimitChecked] = useState(false);
   const [guestLimit, setGuestLimit] = useState<number>(0);
   const [isEventPublic, setIsEventPublic] = useState(false);
-  const [image, setImage] = useState<File | null>(null);
+  const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [postImage, setPostImage] = useState<File | null>(null);
 
   const { data: session } = useSession();
 
@@ -130,7 +131,15 @@ export default function CreateEvent({
         alert("Image must be smaller than 2MB.");
         return;
       }
-      setImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImageBase64(reader.result as string);
+        setPostImage(file);
+      };
+      reader.onerror = () => {
+        alert("Failed to read the selected image.");
+      };
+      reader.readAsDataURL(file);
     }
   }
 
@@ -145,7 +154,7 @@ export default function CreateEvent({
     const combinedStartDate = new Date(`${startDate}T${startTime}`);
 
     if (!title || !description || !startDate || !endDate) {
-      alert("Please fill in all required fields.");
+      toast("Please fill in all required fields.");
       return;
     }
 
@@ -162,8 +171,8 @@ export default function CreateEvent({
       isPeopleLimitChecked ? guestLimit.toString() : "0"
     );
 
-    if (image) {
-      formData.append("image", image);
+    if (imageBase64) {
+      formData.append("imageBase64", imageBase64);
     }
 
     try {
@@ -213,7 +222,7 @@ export default function CreateEvent({
       setIsPeopleLimitChecked(false);
       setGuestLimit(0);
       setIsEventPublic(false);
-      setImage(null);
+      setImageBase64(null);
     } catch (error: any) {
       console.error("Error creating/updating event:", error);
       alert(`Something went wrong: ${error.message}`);
@@ -265,8 +274,18 @@ export default function CreateEvent({
         onChange={(e) => setStartTime(e.target.value)}
       />
 
+      {imageBase64 && (
+        <img
+          src={imageBase64}
+          alt="Selected"
+          className="w-20 h-20 object-cover rounded mt-2"
+        />
+      )}
+
+
       <div className="border rounded-md p-2 cursor-pointer text-gray-500 relative mt-2">
-        <span>Add image...</span>
+        <span>{imageBase64 == null ? "Add image..." : "Change image..."}</span>
+
         <input
           type="file"
           className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"

@@ -2,8 +2,6 @@ import { connect } from "@/app/config/dbConfig";
 import Event from "@/app/models/event";
 import User from "@/app/models/user";
 import { NextRequest, NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
 import { Configuration, OpenAIApi } from "openai";
 
 const configuration = new Configuration({
@@ -11,11 +9,6 @@ const configuration = new Configuration({
   organization: process.env.OPENAI_ORG_ID,
 });
 const openai = new OpenAIApi(configuration);
-
-const uploadDir = path.join(process.cwd(), "public/uploads");
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
 
 export async function POST(req: NextRequest) {
   await connect();
@@ -51,13 +44,16 @@ export async function POST(req: NextRequest) {
     const moderationStatus = flaggedByAI ? "flagged" : "approved";
 
     let imageUrl = "";
-    const file = formData.get("image") as File | null;
-    if (file) {
-      const filePath = path.join(uploadDir, `${Date.now()}-${file.name}`);
+    const imageBase64 = formData.get("imageBase64");
+    const file = formData.get("image");
+
+    if (typeof imageBase64 === "string" && imageBase64.trim().length > 0) {
+      imageUrl = imageBase64;
+    } else if (file instanceof File) {
       const arrayBuffer = await file.arrayBuffer();
-      const buffer = Buffer.from(new Uint8Array(arrayBuffer));
-      fs.writeFileSync(filePath, new Uint8Array(buffer));
-      imageUrl = `/uploads/${path.basename(filePath)}`;
+      const buffer = Buffer.from(arrayBuffer);
+      const mimeType = file.type || "image/jpeg";
+      imageUrl = `data:${mimeType};base64,${buffer.toString("base64")}`;
     }
 
     const newEvent = new Event({
